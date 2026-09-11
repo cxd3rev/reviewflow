@@ -9,6 +9,11 @@ export function nowIso() {
   return new Date().toISOString();
 }
 
+export function publicAppOrigin() {
+  const raw = process.env.APP_URL || process.env.CLIENT_ORIGIN || "http://localhost:5173";
+  return String(raw).split(",")[0].trim();
+}
+
 export function withTransaction(db, fn) {
   db.exec("BEGIN IMMEDIATE");
   try {

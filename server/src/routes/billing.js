@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import express from "express";
+import { publicAppOrigin } from "../db.js";
 import { getEntitlement } from "../middleware/auth.js";
 import {
   billingInfo,
@@ -13,15 +14,13 @@ import {
 export function billingRoutes(db) {
   const router = express.Router();
 
-  router.get("/status", (req, res) => {
-    const subscription = db
-      .prepare("SELECT * FROM subscriptions WHERE business_id = ?")
-      .get(req.business.id);
+  router.get("/status", async (req, res) => {
+    const subscription = await db.getSubscriptionByBusinessId(req.business.id);
     res.json({ entitlement: getEntitlement(subscription), ...billingInfo() });
   });
 
   router.post("/checkout", async (req, res) => {
-    const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+    const origin = publicAppOrigin();
     const successUrl = `${origin}/app/billing?checkout=success`;
 
     if (!isStripeConfigured()) {
@@ -31,19 +30,16 @@ export function billingRoutes(db) {
         });
       }
 
-      db.prepare(
-        `UPDATE subscriptions
-         SET stripe_subscription_id = ?, status = 'active'
-         WHERE business_id = ?`
-      ).run(`local_${randomUUID()}`, req.business.id);
+      await db.updateSubscription(req.business.id, {
+        stripe_subscription_id: `local_${randomUUID()}`,
+        status: "active",
+      });
 
       return res.json({ url: successUrl, provider: "local" });
     }
 
     const stripe = getStripe();
-    const subscription = db
-      .prepare("SELECT * FROM subscriptions WHERE business_id = ?")
-      .get(req.business.id);
+    const subscription = await db.getSubscriptionByBusinessId(req.business.id);
 
     try {
       const session = await stripe.checkout.sessions.create({
@@ -71,10 +67,8 @@ export function billingRoutes(db) {
     }
   });
 
-  router.post("/cancel", (req, res) => {
-    const subscription = db
-      .prepare("SELECT * FROM subscriptions WHERE business_id = ?")
-      .get(req.business.id);
+  router.post("/cancel", async (req, res) => {
+    const subscription = await db.getSubscriptionByBusinessId(req.business.id);
 
     if (!subscription) {
       return res.status(404).json({ error: "No subscription found." });
@@ -85,13 +79,12 @@ export function billingRoutes(db) {
       return res.status(400).json({ error: "Use Manage subscription to cancel a Stripe plan." });
     }
 
-    db.prepare(
-      `UPDATE subscriptions
-       SET status = 'canceled', stripe_subscription_id = NULL
-       WHERE business_id = ?`
-    ).run(req.business.id);
+    await db.updateSubscription(req.business.id, {
+      status: "canceled",
+      stripe_subscription_id: null,
+    });
 
-    const next = db.prepare("SELECT * FROM subscriptions WHERE business_id = ?").get(req.business.id);
+    const next = await db.getSubscriptionByBusinessId(req.business.id);
     res.json({ entitlement: getEntitlement(next) });
   });
 
@@ -101,15 +94,13 @@ export function billingRoutes(db) {
       return res.status(500).json({ error: "Stripe is not configured." });
     }
 
-    const subscription = db
-      .prepare("SELECT * FROM subscriptions WHERE business_id = ?")
-      .get(req.business.id);
+    const subscription = await db.getSubscriptionByBusinessId(req.business.id);
     if (!subscription?.stripe_customer_id) {
       return res.status(400).json({ error: "No Stripe customer yet. Subscribe first." });
     }
 
     try {
-      const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+      const origin = publicAppOrigin();
       const portal = await stripe.billingPortal.sessions.create({
         customer: subscription.stripe_customer_id,
         return_url: `${origin}/app/billing`,
@@ -147,7 +138,7 @@ export function stripeWebhookHandler(db) {
         const businessId = session.metadata?.businessId || session.client_reference_id;
         if (businessId && session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(session.subscription);
-          upsertSubscriptionFromStripe(db, {
+          await upsertSubscriptionFromStripe(db, {
             businessId,
             customerId: session.customer,
             subscription,
@@ -161,12 +152,12 @@ export function stripeWebhookHandler(db) {
         event.type === "customer.subscription.created"
       ) {
         const subscription = event.data.object;
-        const bySub = findBusinessByStripeSubscription(db, subscription.id);
-        const byCustomer = findBusinessByStripeCustomer(db, subscription.customer);
+        const bySub = await findBusinessByStripeSubscription(db, subscription.id);
+        const byCustomer = await findBusinessByStripeCustomer(db, subscription.customer);
         const row = bySub || byCustomer;
         const businessId = subscription.metadata?.businessId || row?.business_id;
         if (businessId) {
-          upsertSubscriptionFromStripe(db, {
+          await upsertSubscriptionFromStripe(db, {
             businessId,
             customerId: subscription.customer,
             subscription,
@@ -176,12 +167,9 @@ export function stripeWebhookHandler(db) {
 
       if (event.type === "invoice.payment_failed") {
         const invoice = event.data.object;
-        const row = findBusinessByStripeCustomer(db, invoice.customer);
+        const row = await findBusinessByStripeCustomer(db, invoice.customer);
         if (row) {
-          db.prepare("UPDATE subscriptions SET status = ? WHERE business_id = ?").run(
-            "past_due",
-            row.business_id
-          );
+          await db.updateSubscription(row.business_id, { status: "past_due" });
         }
       }
     } catch (error) {

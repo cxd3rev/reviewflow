@@ -4,9 +4,10 @@ import { sendReviewEmail } from "./email.js";
 let running = false;
 
 export function startScheduler(db) {
-  const tick = () => processDueRequests(db).catch((error) => {
-    console.error("[scheduler]", error);
-  });
+  const tick = () =>
+    processDueRequests(db).catch((error) => {
+      console.error("[scheduler]", error);
+    });
 
   tick();
   const intervalMs = Number(process.env.SCHEDULER_INTERVAL_MS || 15000);
@@ -19,76 +20,44 @@ export async function processDueRequests(db) {
   running = true;
 
   try {
-    const due = db.prepare(
-      `SELECT * FROM review_requests
-       WHERE status = 'scheduled' AND scheduled_at <= ?
-       ORDER BY scheduled_at ASC
-       LIMIT 25`
-    ).all(new Date().toISOString());
-
+    const due = await db.listDueRequests(new Date().toISOString());
     let sent = 0;
     let failed = 0;
 
     for (const request of due) {
-      const claimed = db.prepare(
-        `UPDATE review_requests
-         SET status = 'sending'
-         WHERE id = ? AND status = 'scheduled'`
-      ).run(request.id);
-
+      const claimed = await db.claimRequest(request.id);
       if (claimed.changes !== 1) continue;
 
       try {
-        const business = db.prepare("SELECT * FROM businesses WHERE id = ?").get(request.business_id);
-        const customer = db.prepare("SELECT * FROM customers WHERE id = ?").get(request.customer_id);
-        const job = db.prepare("SELECT * FROM jobs WHERE id = ?").get(request.job_id);
-        const subscription = db.prepare("SELECT * FROM subscriptions WHERE business_id = ?").get(request.business_id);
+        const business = await db.getBusinessById(request.business_id);
+        const customer = await db.getCustomer(request.customer_id, request.business_id);
+        const job = await db.getJob(request.job_id, request.business_id);
+        const subscription = await db.getSubscriptionByBusinessId(request.business_id);
         const entitlement = getEntitlement(subscription);
 
         if (!entitlement.allowed) {
-          db.prepare(
-            `UPDATE review_requests
-             SET status = 'failed', error_message = ?
-             WHERE id = ?`
-          ).run("Subscription inactive. Request was not sent.", request.id);
+          await db.failRequest(request.id, "Subscription inactive. Request was not sent.");
           failed += 1;
           continue;
         }
 
         if (!job || job.status === "cancelled") {
-          db.prepare(
-            `UPDATE review_requests
-             SET status = 'cancelled', error_message = NULL
-             WHERE id = ?`
-          ).run(request.id);
+          await db.cancelRequest(request.id);
           continue;
         }
 
         if (!customer?.email) {
-          db.prepare(
-            `UPDATE review_requests
-             SET status = 'failed', error_message = ?
-             WHERE id = ?`
-          ).run("This customer doesn't have an email address.", request.id);
+          await db.failRequest(request.id, "This customer doesn't have an email address.");
           failed += 1;
           continue;
         }
 
         const reviewUrl = business?.review_url || request.review_url;
         await sendReviewEmail({ business, customer, reviewUrl });
-
-        db.prepare(
-          `UPDATE review_requests
-           SET status = 'sent', sent_at = ?, error_message = NULL, review_url = ?
-           WHERE id = ? AND status = 'sending'`
-        ).run(new Date().toISOString(), reviewUrl, request.id);
+        await db.markRequestSent(request.id, new Date().toISOString(), reviewUrl);
         sent += 1;
       } catch (error) {
-        db.prepare(
-          `UPDATE review_requests
-           SET status = 'failed', error_message = ?
-           WHERE id = ?`
-        ).run(error.message || "Failed to send email.", request.id);
+        await db.failRequest(request.id, error.message || "Failed to send email.");
         failed += 1;
       }
     }

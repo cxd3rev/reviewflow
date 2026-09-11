@@ -1,49 +1,26 @@
 import { randomUUID } from "node:crypto";
 import express from "express";
-import { mapJob, nowIso, withTransaction } from "../db.js";
+import { mapJob, nowIso } from "../db.js";
 import { cancelUnsentRequests, createReviewRequest } from "../services/reviews.js";
 import { optionalTrim, requireFields, trim } from "../utils/validation.js";
 
 const STATUSES = ["scheduled", "in_progress", "completed", "cancelled"];
 
-function jobWithCustomer(db, jobId, businessId) {
-  return db
-    .prepare(
-      `SELECT jobs.*, customers.first_name || ' ' || customers.last_name AS customer_name,
-              customers.email AS customer_email
-       FROM jobs
-       JOIN customers ON customers.id = jobs.customer_id
-       WHERE jobs.id = ? AND jobs.business_id = ?`
-    )
-    .get(jobId, businessId);
-}
-
 export function jobRoutes(db) {
   const router = express.Router();
 
-  router.get("/", (req, res) => {
-    const rows = db
-      .prepare(
-        `SELECT jobs.*, customers.first_name || ' ' || customers.last_name AS customer_name,
-                customers.email AS customer_email
-         FROM jobs
-         JOIN customers ON customers.id = jobs.customer_id
-         WHERE jobs.business_id = ?
-         ORDER BY jobs.created_at DESC`
-      )
-      .all(req.business.id);
+  router.get("/", async (req, res) => {
+    const rows = await db.listJobs(req.business.id);
     res.json({ jobs: rows.map(mapJob) });
   });
 
-  router.post("/", (req, res) => {
+  router.post("/", async (req, res) => {
     const missing = requireFields(req.body || {}, ["customerId", "title"]);
     if (missing.length) {
       return res.status(400).json({ error: "Customer and job name are required." });
     }
 
-    const customer = db
-      .prepare("SELECT * FROM customers WHERE id = ? AND business_id = ?")
-      .get(req.body.customerId, req.business.id);
+    const customer = await db.getCustomer(req.body.customerId, req.business.id);
     if (!customer) {
       return res.status(400).json({ error: "Customer not found." });
     }
@@ -52,24 +29,20 @@ export function jobRoutes(db) {
     const id = randomUUID();
     const completedAt = status === "completed" ? nowIso() : null;
 
-    db.prepare(
-      `INSERT INTO jobs (
-        id, business_id, customer_id, title, description, completed_at, status, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(
+    await db.insertJob({
       id,
-      req.business.id,
-      customer.id,
-      trim(req.body.title),
-      optionalTrim(req.body.description),
-      completedAt,
+      business_id: req.business.id,
+      customer_id: customer.id,
+      title: trim(req.body.title),
+      description: optionalTrim(req.body.description),
+      completed_at: completedAt,
       status,
-      nowIso()
-    );
+      created_at: nowIso(),
+    });
 
     let reviewRequest = null;
     if (status === "completed") {
-      reviewRequest = createReviewRequest(db, {
+      reviewRequest = await createReviewRequest(db, {
         business: req.businessRow,
         customer,
         job: { id },
@@ -77,19 +50,15 @@ export function jobRoutes(db) {
       });
     }
 
-    res.status(201).json({ job: mapJob(jobWithCustomer(db, id, req.business.id)), reviewRequest });
+    res.status(201).json({ job: mapJob(await db.getJobWithCustomer(id, req.business.id)), reviewRequest });
   });
 
-  router.put("/:id", (req, res) => {
-    const existing = db
-      .prepare("SELECT * FROM jobs WHERE id = ? AND business_id = ?")
-      .get(req.params.id, req.business.id);
+  router.put("/:id", async (req, res) => {
+    const existing = await db.getJob(req.params.id, req.business.id);
     if (!existing) return res.status(404).json({ error: "Job not found." });
 
     const customerId = req.body?.customerId || existing.customer_id;
-    const customer = db
-      .prepare("SELECT * FROM customers WHERE id = ? AND business_id = ?")
-      .get(customerId, req.business.id);
+    const customer = await db.getCustomer(customerId, req.business.id);
     if (!customer) {
       return res.status(400).json({ error: "Customer not found." });
     }
@@ -109,21 +78,23 @@ export function jobRoutes(db) {
     }
 
     if (existing.status === "completed" && status !== "completed") {
-      cancelUnsentRequests(db, { jobId: existing.id, businessId: req.business.id });
+      await cancelUnsentRequests(db, { jobId: existing.id, businessId: req.business.id });
     }
 
     if (status === "cancelled") {
-      cancelUnsentRequests(db, { jobId: existing.id, businessId: req.business.id });
+      await cancelUnsentRequests(db, { jobId: existing.id, businessId: req.business.id });
     }
 
-    db.prepare(
-      `UPDATE jobs
-       SET customer_id = ?, title = ?, description = ?, completed_at = ?, status = ?
-       WHERE id = ? AND business_id = ?`
-    ).run(customer.id, title, description, completedAt, status, existing.id, req.business.id);
+    await db.updateJob(existing.id, req.business.id, {
+      customer_id: customer.id,
+      title,
+      description,
+      completed_at: completedAt,
+      status,
+    });
 
     if (status === "completed" && existing.status !== "completed") {
-      reviewRequest = createReviewRequest(db, {
+      reviewRequest = await createReviewRequest(db, {
         business: req.businessRow,
         customer,
         job: { id: existing.id },
@@ -132,25 +103,15 @@ export function jobRoutes(db) {
     }
 
     res.json({
-      job: mapJob(jobWithCustomer(db, existing.id, req.business.id)),
+      job: mapJob(await db.getJobWithCustomer(existing.id, req.business.id)),
       reviewRequest,
     });
   });
 
-  router.delete("/:id", (req, res) => {
-    const existing = db
-      .prepare("SELECT id FROM jobs WHERE id = ? AND business_id = ?")
-      .get(req.params.id, req.business.id);
+  router.delete("/:id", async (req, res) => {
+    const existing = await db.getJob(req.params.id, req.business.id);
     if (!existing) return res.status(404).json({ error: "Job not found." });
-
-    withTransaction(db, () => {
-      db.prepare("DELETE FROM review_requests WHERE job_id = ? AND business_id = ?").run(
-        existing.id,
-        req.business.id
-      );
-      db.prepare("DELETE FROM jobs WHERE id = ? AND business_id = ?").run(existing.id, req.business.id);
-    });
-
+    await db.deleteJobCascade(existing.id, req.business.id);
     res.json({ ok: true });
   });
 

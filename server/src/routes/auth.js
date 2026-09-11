@@ -7,7 +7,6 @@ import {
   mapBusiness,
   nowIso,
   publicUser,
-  withTransaction,
 } from "../db.js";
 import { authRequired, getEntitlement, signToken } from "../middleware/auth.js";
 import { billingInfo } from "../services/stripe.js";
@@ -34,47 +33,50 @@ export function authRoutes(db) {
       return res.status(400).json({ error: "Password must be at least 8 characters." });
     }
 
-    const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+    if (!(await db.pingTables())) {
+      return res.status(503).json({
+        error: "The hosted database is not ready. Run supabase/schema.sql in the Supabase SQL editor.",
+      });
+    }
+
+    const existing = await db.getUserByEmail(email);
     if (existing) {
       return res.status(409).json({ error: "An account with this email already exists." });
     }
 
     const userId = randomUUID();
     const businessId = randomUUID();
-    const subscriptionId = randomUUID();
     const createdAt = nowIso();
     const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const passwordHash = await bcrypt.hash(password, 12);
 
-    withTransaction(db, () => {
-      db.prepare(
-        "INSERT INTO users (id, name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)"
-      ).run(userId, name, email, passwordHash, createdAt);
-
-      db.prepare(
-        `INSERT INTO businesses (
-          id, user_id, name, type, review_url, review_delay_minutes, automation_enabled,
-          sender_name, email_subject, email_message, onboarding_complete, created_at
-        ) VALUES (?, ?, ?, NULL, NULL, 1440, 1, ?, ?, ?, 0, ?)`
-      ).run(
-        businessId,
-        userId,
-        businessName,
-        businessName,
-        DEFAULT_EMAIL_SUBJECT,
-        DEFAULT_EMAIL_MESSAGE,
-        createdAt
-      );
-
-      db.prepare(
-        `INSERT INTO subscriptions (
-          id, business_id, stripe_customer_id, stripe_subscription_id, status, trial_ends_at, created_at
-        ) VALUES (?, ?, NULL, NULL, 'trialing', ?, ?)`
-      ).run(subscriptionId, businessId, trialEndsAt, createdAt);
+    await db.insertUser({ id: userId, name, email, password_hash: passwordHash, created_at: createdAt });
+    await db.insertBusiness({
+      id: businessId,
+      user_id: userId,
+      name: businessName,
+      type: null,
+      review_url: null,
+      review_delay_minutes: 1440,
+      automation_enabled: true,
+      sender_name: businessName,
+      email_subject: DEFAULT_EMAIL_SUBJECT,
+      email_message: DEFAULT_EMAIL_MESSAGE,
+      onboarding_complete: false,
+      created_at: createdAt,
+    });
+    await db.insertSubscription({
+      id: randomUUID(),
+      business_id: businessId,
+      stripe_customer_id: null,
+      stripe_subscription_id: null,
+      status: "trialing",
+      trial_ends_at: trialEndsAt,
+      created_at: createdAt,
     });
 
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
-    const business = db.prepare("SELECT * FROM businesses WHERE id = ?").get(businessId);
+    const user = await db.getUserById(userId);
+    const business = await db.getBusinessById(businessId);
     res.status(201).json({
       token: signToken(userId),
       user: publicUser(user),
@@ -90,7 +92,7 @@ export function authRoutes(db) {
       return res.status(400).json({ error: "Email and password are required." });
     }
 
-    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    const user = await db.getUserByEmail(email);
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password." });
     }
@@ -100,7 +102,7 @@ export function authRoutes(db) {
       return res.status(401).json({ error: "Invalid email or password." });
     }
 
-    const business = db.prepare("SELECT * FROM businesses WHERE user_id = ?").get(user.id);
+    const business = await db.getBusinessByUserId(user.id);
     res.json({
       token: signToken(user.id),
       user: publicUser(user),
@@ -112,10 +114,8 @@ export function authRoutes(db) {
     res.json({ ok: true });
   });
 
-  router.get("/me", authRequired(db), (req, res) => {
-    const subscription = db
-      .prepare("SELECT * FROM subscriptions WHERE business_id = ?")
-      .get(req.business.id);
+  router.get("/me", authRequired(db), async (req, res) => {
+    const subscription = await db.getSubscriptionByBusinessId(req.business.id);
     res.json({
       user: req.user,
       business: req.business,
@@ -136,29 +136,21 @@ export function authRoutes(db) {
       return res.status(400).json({ error: "Please enter a valid email address." });
     }
 
-    const taken = db
-      .prepare("SELECT id FROM users WHERE email = ? AND id != ?")
-      .get(email, req.user.id);
+    const taken = await db.getUserIdByEmailExcept(email, req.user.id);
     if (taken) {
       return res.status(409).json({ error: "That email is already in use." });
     }
 
+    const patch = { name, email };
     if (password) {
       if (password.length < 8) {
         return res.status(400).json({ error: "Password must be at least 8 characters." });
       }
-      const passwordHash = await bcrypt.hash(password, 12);
-      db.prepare("UPDATE users SET name = ?, email = ?, password_hash = ? WHERE id = ?").run(
-        name,
-        email,
-        passwordHash,
-        req.user.id
-      );
-    } else {
-      db.prepare("UPDATE users SET name = ?, email = ? WHERE id = ?").run(name, email, req.user.id);
+      patch.password_hash = await bcrypt.hash(password, 12);
     }
 
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user.id);
+    await db.updateUser(req.user.id, patch);
+    const user = await db.getUserById(req.user.id);
     res.json({ user: publicUser(user) });
   });
 

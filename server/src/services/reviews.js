@@ -21,19 +21,13 @@ export function canScheduleReview({ business, customer, sendAutomatically }) {
   return { ok: true };
 }
 
-export function createReviewRequest(db, { business, customer, job, sendAutomatically }) {
+export async function createReviewRequest(db, { business, customer, job, sendAutomatically }) {
   const check = canScheduleReview({ business, customer, sendAutomatically });
   if (!check.ok) {
     return check;
   }
 
-  const existing = db
-    .prepare(
-      `SELECT id, status FROM review_requests
-       WHERE job_id = ? AND business_id = ? AND status IN ('scheduled', 'sent')`
-    )
-    .get(job.id, business.id);
-
+  const existing = await db.getRequestByJob(job.id, business.id);
   if (existing) {
     return { ok: false, skipped: true, reason: "duplicate", requestId: existing.id };
   }
@@ -42,19 +36,22 @@ export function createReviewRequest(db, { business, customer, job, sendAutomatic
   const scheduledAt = new Date(Date.now() + delayMinutes * 60 * 1000).toISOString();
   const id = randomUUID();
 
-  db.prepare(
-    `INSERT INTO review_requests (
-      id, business_id, customer_id, job_id, scheduled_at, sent_at, status, error_message, review_url, created_at
-    ) VALUES (?, ?, ?, ?, ?, NULL, 'scheduled', NULL, ?, ?)`
-  ).run(id, business.id, customer.id, job.id, scheduledAt, business.review_url, nowIso());
+  await db.insertRequest({
+    id,
+    business_id: business.id,
+    customer_id: customer.id,
+    job_id: job.id,
+    scheduled_at: scheduledAt,
+    sent_at: null,
+    status: "scheduled",
+    error_message: null,
+    review_url: business.review_url,
+    created_at: nowIso(),
+  });
 
   return { ok: true, requestId: id, scheduledAt };
 }
 
-export function cancelUnsentRequests(db, { jobId, businessId }) {
-  db.prepare(
-    `UPDATE review_requests
-     SET status = 'cancelled'
-     WHERE job_id = ? AND business_id = ? AND status = 'scheduled'`
-  ).run(jobId, businessId);
+export async function cancelUnsentRequests(db, { jobId, businessId }) {
+  await db.cancelUnsentForJob(jobId, businessId);
 }

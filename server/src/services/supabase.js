@@ -32,3 +32,23 @@ export function attachSupabase(req, _res, next) {
   }
   next();
 }
+
+export async function pingSupabaseAuth() {
+  const status = supabaseEnvStatus();
+  if (!status.configured) {
+    return { configured: false, url: null, authOk: false, error: status.error };
+  }
+  try {
+    const client = getSupabaseAnon();
+    if (!client) {
+      return { configured: true, url: status.url, authOk: false, error: "Could not create a publishable Supabase client." };
+    }
+    const { error } = await client.auth.getSession();
+    if (error) {
+      return { configured: true, url: status.url, authOk: false, error: error.message };
+    }
+    return { configured: true, url: status.url, authOk: true, error: null };
+  } catch (error) {
+    return { configured: true, url: status.url, authOk: false, error: error.message };
+  }
+}

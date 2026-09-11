@@ -4,9 +4,7 @@ import { fileURLToPath } from "node:url";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { openDatabase } from "./db.js";
-import { authRequired } from "./middleware/auth.js";
-import { requireAccess } from "./middleware/auth.js";
+import { authRequired, requireAccess } from "./middleware/auth.js";
 import { authRoutes } from "./routes/auth.js";
 import { billingRoutes, stripeWebhookHandler } from "./routes/billing.js";
 import { businessRoutes } from "./routes/business.js";
@@ -15,7 +13,8 @@ import { dashboardRoutes } from "./routes/dashboard.js";
 import { jobRoutes } from "./routes/jobs.js";
 import { requestRoutes } from "./routes/requests.js";
 import { startScheduler } from "./services/scheduler.js";
-import { attachSupabase, supabaseEnvStatus } from "./services/supabase.js";
+import { attachSupabase, pingSupabaseAuth } from "./services/supabase.js";
+import { createStore } from "./store/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -26,18 +25,20 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-const db = openDatabase();
-db.prepare(
-  `UPDATE review_requests SET status = 'scheduled' WHERE status = 'sending'`
-).run();
+const db = await createStore();
+await db.resetSendingRequests();
+const tablesOk = await db.pingTables();
 
 const app = express();
-const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const origins = String(process.env.CLIENT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
 
 app.disable("x-powered-by");
 app.use(
   cors({
-    origin,
+    origin: origins.length === 1 ? origins[0] : origins,
     credentials: true,
   })
 );
@@ -51,12 +52,19 @@ app.post(
 app.use(express.json({ limit: "100kb" }));
 app.use(attachSupabase);
 
-app.get("/api/health", (_req, res) => {
-  const supabase = supabaseEnvStatus();
+app.get("/api/health", async (_req, res) => {
+  const supabase = await pingSupabaseAuth();
   res.json({
     ok: true,
     service: "starywrld",
-    supabase: { configured: supabase.configured, url: supabase.url },
+    database: db.kind,
+    tablesOk,
+    supabase: {
+      configured: supabase.configured,
+      url: supabase.url,
+      authOk: supabase.authOk,
+      error: supabase.error,
+    },
   });
 });
 

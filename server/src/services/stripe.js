@@ -22,33 +22,35 @@ export function billingInfo() {
   };
 }
 
-export function upsertSubscriptionFromStripe(db, { businessId, customerId, subscription }) {
-  const existing = db.prepare("SELECT * FROM subscriptions WHERE business_id = ?").get(businessId);
+export async function upsertSubscriptionFromStripe(db, { businessId, customerId, subscription }) {
+  const existing = await db.getSubscriptionByBusinessId(businessId);
   const status = subscription?.status || existing?.status || "trialing";
   const trialEndsAt = existing?.trial_ends_at || nowIso();
 
   if (existing) {
-    db.prepare(
-      `UPDATE subscriptions
-       SET stripe_customer_id = COALESCE(?, stripe_customer_id),
-           stripe_subscription_id = COALESCE(?, stripe_subscription_id),
-           status = ?
-       WHERE business_id = ?`
-    ).run(customerId || null, subscription?.id || null, status, businessId);
+    await db.updateSubscription(businessId, {
+      stripe_customer_id: customerId || existing.stripe_customer_id,
+      stripe_subscription_id: subscription?.id || existing.stripe_subscription_id,
+      status,
+    });
     return;
   }
 
-  db.prepare(
-    `INSERT INTO subscriptions (
-      id, business_id, stripe_customer_id, stripe_subscription_id, status, trial_ends_at, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).run(randomUUID(), businessId, customerId || null, subscription?.id || null, status, trialEndsAt, nowIso());
+  await db.insertSubscription({
+    id: randomUUID(),
+    business_id: businessId,
+    stripe_customer_id: customerId || null,
+    stripe_subscription_id: subscription?.id || null,
+    status,
+    trial_ends_at: trialEndsAt,
+    created_at: nowIso(),
+  });
 }
 
-export function findBusinessByStripeCustomer(db, stripeCustomerId) {
-  return db.prepare("SELECT * FROM subscriptions WHERE stripe_customer_id = ?").get(stripeCustomerId);
+export async function findBusinessByStripeCustomer(db, stripeCustomerId) {
+  return db.getSubscriptionByStripeCustomer(stripeCustomerId);
 }
 
-export function findBusinessByStripeSubscription(db, stripeSubscriptionId) {
-  return db.prepare("SELECT * FROM subscriptions WHERE stripe_subscription_id = ?").get(stripeSubscriptionId);
+export async function findBusinessByStripeSubscription(db, stripeSubscriptionId) {
+  return db.getSubscriptionByStripeSubscription(stripeSubscriptionId);
 }

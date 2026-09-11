@@ -25,6 +25,9 @@ fs.mkdirSync(dest);
 copyDir(path.join(root, "client"), path.join(dest, "client"));
 copyDir(path.join(root, "server"), path.join(dest, "server"));
 copyDir(path.join(root, "scripts"), path.join(dest, "scripts"));
+if (fs.existsSync(path.join(root, "supabase"))) {
+  copyDir(path.join(root, "supabase"), path.join(dest, "supabase"));
+}
 if (fs.existsSync(path.join(root, "docs"))) {
   copyDir(path.join(root, "docs"), path.join(dest, "docs"));
 }
@@ -32,7 +35,17 @@ if (fs.existsSync(path.join(root, ".github"))) {
   copyDir(path.join(root, ".github"), path.join(dest, ".github"));
 }
 
-for (const file of ["package.json", "package-lock.json", "README.md", ".gitignore", ".env.example", "index.html"]) {
+for (const file of [
+  "package.json",
+  "package-lock.json",
+  "README.md",
+  ".gitignore",
+  ".env.example",
+  "index.html",
+  "Dockerfile",
+  ".dockerignore",
+  "render.yaml",
+]) {
   const src = path.join(root, file);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dest, file));
 }

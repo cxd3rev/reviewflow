@@ -6,7 +6,7 @@ export function signToken(userId) {
 }
 
 export function authRequired(db) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const header = req.headers.authorization || "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : null;
     if (!token) {
@@ -15,12 +15,12 @@ export function authRequired(db) {
 
     try {
       const payload = jwt.verify(token, process.env.JWT_SECRET);
-      const user = db.prepare("SELECT * FROM users WHERE id = ?").get(payload.sub);
+      const user = await db.getUserById(payload.sub);
       if (!user) {
         return res.status(401).json({ error: "Please sign in." });
       }
 
-      const business = db.prepare("SELECT * FROM businesses WHERE user_id = ?").get(user.id);
+      const business = await db.getBusinessByUserId(user.id);
       req.user = publicUser(user);
       req.userRow = user;
       req.business = mapBusiness(business);
@@ -47,7 +47,8 @@ export function getEntitlement(subscription) {
   const now = Date.now();
   const trialEnds = new Date(subscription.trial_ends_at).getTime();
   const trialActive = Number.isFinite(trialEnds) && trialEnds > now;
-  const paidActive = ["active", "trialing"].includes(subscription.status) && Boolean(subscription.stripe_subscription_id);
+  const paidActive =
+    ["active", "trialing"].includes(subscription.status) && Boolean(subscription.stripe_subscription_id);
   const daysLeft = trialActive ? Math.max(0, Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24))) : 0;
 
   return {
@@ -63,10 +64,8 @@ export function getEntitlement(subscription) {
 }
 
 export function requireAccess(db) {
-  return (req, res, next) => {
-    const subscription = db
-      .prepare("SELECT * FROM subscriptions WHERE business_id = ?")
-      .get(req.business?.id);
+  return async (req, res, next) => {
+    const subscription = await db.getSubscriptionByBusinessId(req.business?.id);
     const entitlement = getEntitlement(subscription);
     req.entitlement = entitlement;
     if (!entitlement.allowed) {
