@@ -63,10 +63,9 @@ export function businessRoutes(db) {
       req.body?.emailMessage !== undefined ? String(req.body.emailMessage) : current.email_message;
     const automationEnabled =
       req.body?.automationEnabled !== undefined ? Boolean(req.body.automationEnabled) : current.automation_enabled;
-    const delay =
-      req.body?.reviewDelayMinutes !== undefined
-        ? Number(req.body.reviewDelayMinutes)
-        : current.review_delay_minutes;
+    const delay = Number(
+      req.body?.reviewDelayMinutes !== undefined ? req.body.reviewDelayMinutes : current.review_delay_minutes
+    );
     const reviewDelayMinutes = DELAYS.includes(delay) ? delay : current.review_delay_minutes;
 
     if (!name) {

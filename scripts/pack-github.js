@@ -45,6 +45,8 @@ for (const file of [
   "Dockerfile",
   ".dockerignore",
   "render.yaml",
+  "eslint.config.js",
+  "tsconfig.json",
 ]) {
   const src = path.join(root, file);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dest, file));

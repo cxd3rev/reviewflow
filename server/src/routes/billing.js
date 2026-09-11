@@ -39,6 +39,11 @@ export function billingRoutes(db) {
     }
 
     const stripe = getStripe();
+    if (!stripe) {
+      return res.status(503).json({
+        error: "Payments are not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID.",
+      });
+    }
     const subscription = await db.getSubscriptionByBusinessId(req.business.id);
 
     try {

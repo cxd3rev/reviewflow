@@ -28,7 +28,7 @@ function withRequestJoins(request, customer, job) {
 }
 
 export function createSupabaseStore() {
-  const sb = createAdminClient();
+  const sb = /** @type {any} */ (createAdminClient());
 
   async function one(query) {
     const { data, error } = await query.maybeSingle();

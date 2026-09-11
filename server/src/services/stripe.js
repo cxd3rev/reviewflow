@@ -10,6 +10,7 @@ export function isStripeConfigured() {
   return keyOk && priceOk;
 }
 
+/** @returns {any} */
 export function getStripe() {
   if (!isStripeConfigured()) return null;
   return new Stripe(process.env.STRIPE_SECRET_KEY);
