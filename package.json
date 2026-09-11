@@ -4,7 +4,13 @@
   "type": "module",
   "version": "1.0.0",
   "description": "Automatically request reviews after completed jobs.",
-  "workspaces": ["client", "server"],
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "concurrently -n server,client -c teal,blue \"npm run dev -w starywrld-server\" \"npm run dev -w starywrld-client\"",
     "dev:server": "npm run dev -w starywrld-server",
@@ -14,9 +20,23 @@
     "start": "npm run start -w starywrld-server",
     "seed": "npm run seed -w starywrld-server",
     "clean:deps": "node scripts/clean-deps.js",
-    "pack:github": "node scripts/pack-github.js"
+    "pack:github": "node scripts/pack-github.js",
+    "check:supabase": "node scripts/check-supabase.js",
+    "setup:supabase": "node scripts/setup-supabase.js",
+    "lint": "eslint client/src server/src scripts client/vite.config.js eslint.config.js",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@eslint/js": "^9.39.5",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^17.12.0",
+    "typescript": "^7.0.2"
   }
 }

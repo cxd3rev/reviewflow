@@ -10,7 +10,7 @@ Price: **€29,99/month**, with a **7-day free trial**.
 
 - **Frontend:** React, Vite, Tailwind CSS, React Router
 - **Backend:** Node.js, Express
-- **Database:** SQLite via Node’s built-in `node:sqlite`
+- **Database:** Supabase Postgres when `SUPABASE_SECRET_KEY` is set; otherwise local SQLite
 - **Auth:** Email + password (bcrypt), JWT
 - **Email:** Resend (or console logging in development)
 - **Payments:** Stripe Checkout + Customer Portal + webhooks
@@ -34,8 +34,9 @@ No extra services, queues, or microservices. One API process and a static fronte
   /src/middleware       Auth and trial/subscription checks
   /src/services         Email, scheduler, Stripe, review requests
   /src/utils            Validation and email templates
-  /src/db               SQL schema
-  /database             SQLite file (created at runtime)
+  /src/db               Local SQLite schema
+  /database             SQLite file (created at runtime if Supabase is not set)
+/supabase               Postgres schema for the hosted database
 .env.example            Environment variable template
 ```
 
@@ -94,7 +95,7 @@ Save, wait a minute, then open the Pages URL again.
 
 If Pages is still set to **/ (root)**, the root `index.html` will send visitors to `/docs/`.
 
-Login and review emails will not work on GitHub Pages, because there is no Node server there. Use `npm run dev` on your computer for the full app.
+Login and review emails will not work on GitHub Pages, because there is no Node server there. Host the Node API (see **How to deploy**) and set `VITE_API_URL` when you build the Pages site, or use a single Render/Railway service that serves both the API and `client/dist`.
 
 ## How to install
 
@@ -133,7 +134,9 @@ See `.env.example`.
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | Path to the SQLite file |
+| `DATABASE_URL` | Path to the SQLite file (fallback only) |
+| `APP_URL` | Public app URL for Stripe redirects |
+| `VITE_API_URL` | Hosted API origin for the browser (leave empty locally) |
 | `JWT_SECRET` | Signs login tokens |
 | `STRIPE_SECRET_KEY` | Stripe API key |
 | `STRIPE_WEBHOOK_SECRET` | Verifies Stripe webhooks |
@@ -165,13 +168,17 @@ Until Stripe is configured, new accounts still get a 7-day trial and can use the
 
 ## How to configure Supabase
 
+Supabase is the hosted database for accounts, customers, jobs, review requests, and subscriptions.
+
 1. Copy the `SUPABASE_*` and `VITE_SUPABASE_*` lines from `.env.example` into `.env`.
 2. Replace the placeholders with the values from your Supabase project (**Project Settings → API Keys**).
-3. Restart `npm run dev` so both Express and Vite reload env.
-4. Open http://localhost:3001/api/health — `supabase.configured` should be `true`.
-5. Sign in and open Settings — it should say the browser client is connected.
+3. In Supabase open **SQL Editor**, paste `supabase/schema.sql`, and run it once.
+4. Restart `npm run dev`.
+5. Open http://localhost:3001/api/health — `database` should be `supabase` and `tablesOk` should be `true`.
+6. Optional: `npm run check:supabase` (auth ping + table ping).
+7. Optional: `npm run seed` to create `aron@starywrld.test` / `Demo1234!` in Supabase.
 
-Login for the app is still starywrld email/password in SQLite. The server uses `@supabase/server`; the Vite app uses `@supabase/supabase-js` in `client/src/lib/supabase.js`. Do not put `SUPABASE_SECRET_KEY` in GitHub or in any `VITE_` variable.
+The app login is still starywrld email/password (stored in the `users` table). Do not put `SUPABASE_SECRET_KEY` in GitHub or in any `VITE_` variable.
 
 If this secret was pasted in chat, rotate it in the Supabase dashboard and put the new value only in `.env`.
 
@@ -213,16 +220,16 @@ In production the Express server serves `client/dist` so you can host a single N
 
 ## How to deploy
 
-A cheap single-service host (Render, Railway, a small VPS) is enough.
+GitHub Pages cannot run Express. Use one Node host (Render is set up in `render.yaml` + `Dockerfile`) plus Supabase for data.
 
-1. Set all production environment variables, including a strong `JWT_SECRET`.
-2. Point `DATABASE_URL` at a persistent disk path so SQLite survives restarts.
-3. Set `CLIENT_ORIGIN` to your public URL.
-4. Set `EMAIL_LOG_ONLY=false` and configure Resend.
-5. Point Stripe webhooks at `https://your-domain/api/billing/webhook`.
-6. Build the client, then start the server with `NODE_ENV=production`.
+1. Run `supabase/schema.sql` in the Supabase SQL editor.
+2. Create a web service from this repo (Render: Docker runtime).
+3. Set production env vars: `JWT_SECRET`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `SUPABASE_JWKS_URL`, `CLIENT_ORIGIN`, `APP_URL`.
+4. Set `CLIENT_ORIGIN` and `APP_URL` to the public site URL (comma-separate extra origins if you also use GitHub Pages).
+5. Set `EMAIL_LOG_ONLY=false` and configure Resend when you want real emails.
+6. Point Stripe webhooks at `https://your-domain/api/billing/webhook`.
 
-SQLite is fine for an early MVP. Move to Postgres later if you outgrow a single disk.
+In production Express serves `client/dist`, so one Node process is enough. Leave `VITE_API_URL` empty in that case. If the UI is on GitHub Pages and the API is elsewhere, build the client with `VITE_API_URL=https://your-api-host`.
 
 ## Test the core flow
 

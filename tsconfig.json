@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "maxNodeModuleJsDepth": 0,
+    "types": ["node"]
+  },
+  "include": [
+    "client/src/**/*.js",
+    "client/src/**/*.jsx",
+    "client/src/vite-env.d.ts",
+    "server/src/**/*.js",
+    "server/src/**/*.d.ts",
+    "scripts/**/*.js"
+  ],
+  "exclude": ["node_modules", "client/dist", "docs", "upload"]
+}
