@@ -13,7 +13,7 @@ const env = {
   VITE_BASE: "./",
 };
 
-const result = spawnSync("npm", ["run", "build", "-w", "reviewflow-client"], {
+const result = spawnSync("npm", ["run", "build", "-w", "starywrld-client"], {
   cwd: root,
   env,
   stdio: "inherit",

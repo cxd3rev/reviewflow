@@ -40,7 +40,7 @@ export default function Billing() {
   }
 
   async function cancelLocal() {
-    if (!confirm("Cancel ReviewFlow Pro?")) return;
+    if (!confirm("Cancel starywrld Pro?")) return;
     setBusy(true);
     setError("");
     try {
@@ -53,7 +53,7 @@ export default function Billing() {
     }
   }
 
-  const planLabel = entitlement?.plan === "pro" ? "ReviewFlow Pro" : entitlement?.trialActive ? "Free trial" : "No active plan";
+  const planLabel = entitlement?.plan === "pro" ? "starywrld Pro" : entitlement?.trialActive ? "Free trial" : "No active plan";
   const localPro = entitlement?.plan === "pro" && String(entitlement?.stripeSubscriptionId || "").startsWith("local_");
   const stripeReady = billing?.stripeConfigured;
 
@@ -74,7 +74,7 @@ export default function Billing() {
       )}
 
       <div className="card p-8">
-        <div className="text-sm font-semibold text-brand-600">ReviewFlow Pro</div>
+        <div className="text-sm font-semibold text-brand-600">starywrld Pro</div>
         <div className="mt-2 flex items-baseline gap-1">
           <span className="display text-4xl font-bold tracking-tight">{PRICE_EUR}</span>
           <span className="text-muted">/month</span>

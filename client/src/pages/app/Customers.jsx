@@ -64,7 +64,7 @@ export default function Customers() {
     <div>
       <PageHeader
         title="Customers"
-        description="Add an email so ReviewFlow can ask them for a review after a job."
+        description="Add an email so starywrld can ask them for a review after a job."
         action={
           <button className="btn-primary" onClick={openNew}>
             Add customer

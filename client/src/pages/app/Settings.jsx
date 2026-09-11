@@ -178,7 +178,7 @@ export default function Settings() {
       <div className="card space-y-2 p-6">
         <h2 className="section-title">Plan</h2>
         <p className="text-sm text-muted">
-          {entitlement?.plan === "pro" ? "ReviewFlow Pro" : entitlement?.trialActive ? "Free trial" : "Inactive"} · {entitlement?.status}
+          {entitlement?.plan === "pro" ? "starywrld Pro" : entitlement?.trialActive ? "Free trial" : "Inactive"} · {entitlement?.status}
         </p>
         <Link className="link inline-block pt-1" to="/app/billing">
           Manage billing

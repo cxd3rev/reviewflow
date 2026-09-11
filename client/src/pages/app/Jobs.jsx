@@ -79,7 +79,7 @@ export default function Jobs() {
     <div>
       <PageHeader
         title="Jobs"
-        description="When you mark a job completed, ReviewFlow can email a review request."
+        description="When you mark a job completed, starywrld can email a review request."
         action={
           <button className="btn-primary" onClick={openNew} disabled={customers.length === 0}>
             Add job

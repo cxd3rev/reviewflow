@@ -55,7 +55,7 @@ app.get("/api/health", (_req, res) => {
   const supabase = supabaseEnvStatus();
   res.json({
     ok: true,
-    service: "reviewflow",
+    service: "starywrld",
     supabase: { configured: supabase.configured, url: supabase.url },
   });
 });
@@ -88,6 +88,6 @@ app.use((err, _req, res, _next) => {
 
 const port = Number(process.env.PORT || 3001);
 app.listen(port, () => {
-  console.log(`ReviewFlow API running on http://localhost:${port}`);
+  console.log(`starywrld API running on http://localhost:${port}`);
   startScheduler(db);
 });

@@ -10,7 +10,7 @@ export function Pricing() {
         <p className="mx-auto mt-4 max-w-xl text-lg text-muted">Start free for 7 days. Upgrade when you’re ready.</p>
         <div className="card mx-auto mt-12 max-w-md p-8 text-left shadow-lg">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-brand-600">ReviewFlow Pro</div>
+            <div className="text-sm font-semibold text-brand-600">starywrld Pro</div>
             <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">Most popular</span>
           </div>
           <div className="mt-3 flex items-end gap-1">

@@ -1,8 +1,8 @@
-# ReviewFlow
+# starywrld
 
 Automatically request reviews after completed jobs.
 
-ReviewFlow is a small SaaS for local service businesses — painters, plumbers, cleaners, and similar trades. After a job is marked completed, it schedules an email asking the customer to leave a review and sends them to the business’s Google (or other) review page.
+starywrld is a small SaaS for local service businesses — painters, plumbers, cleaners, and similar trades. After a job is marked completed, it schedules an email asking the customer to leave a review and sends them to the business’s Google (or other) review page.
 
 Price: **€29,99/month**, with a **7-day free trial**.
 
@@ -69,7 +69,7 @@ Do **not** drag the original `client`, `server`, or `node_modules` folders — t
 
 ## GitHub Pages (the website URL)
 
-GitHub Pages can only host **static files**. That is why you saw a 404: the repo had no `index.html` at the site root. The login/API part still needs a computer running `npm run dev` (or another host). Pages can show the ReviewFlow website UI.
+GitHub Pages can only host **static files**. That is why you saw a 404: the repo had no `index.html` at the site root. The login/API part still needs a computer running `npm run dev` (or another host). Pages can show the starywrld website UI.
 
 1. On your computer run:
 
@@ -124,7 +124,7 @@ npm run seed
 
 Demo login:
 
-- Email: `aron@reviewflow.test`
+- Email: `aron@starywrld.test`
 - Password: `Demo1234!`
 
 ## Environment variables
@@ -152,7 +152,7 @@ See `.env.example`.
 
 ## How to configure Stripe
 
-1. Create a Stripe account and a Product named **ReviewFlow Pro**.
+1. Create a Stripe account and a Product named **starywrld Pro**.
 2. Add a recurring price of **€29,99 / month**.
 3. Copy the price id into `STRIPE_PRICE_ID`.
 4. Put your secret key in `STRIPE_SECRET_KEY`.
@@ -171,7 +171,7 @@ Until Stripe is configured, new accounts still get a 7-day trial and can use the
 4. Open http://localhost:3001/api/health — `supabase.configured` should be `true`.
 5. Sign in and open Settings — it should say the browser client is connected.
 
-Login for the app is still ReviewFlow email/password in SQLite. The server uses `@supabase/server`; the Vite app uses `@supabase/supabase-js` in `client/src/lib/supabase.js`. Do not put `SUPABASE_SECRET_KEY` in GitHub or in any `VITE_` variable.
+Login for the app is still starywrld email/password in SQLite. The server uses `@supabase/server`; the Vite app uses `@supabase/supabase-js` in `client/src/lib/supabase.js`. Do not put `SUPABASE_SECRET_KEY` in GitHub or in any `VITE_` variable.
 
 If this secret was pasted in chat, rotate it in the Supabase dashboard and put the new value only in `.env`.
 
