@@ -92,6 +92,12 @@ export function authRoutes(db) {
       return res.status(400).json({ error: "Email and password are required." });
     }
 
+    if (!(await db.pingTables())) {
+      return res.status(503).json({
+        error: "The hosted database is not ready. Run supabase/schema.sql in the Supabase SQL editor.",
+      });
+    }
+
     const user = await db.getUserByEmail(email);
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password." });

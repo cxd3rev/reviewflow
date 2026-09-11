@@ -82,3 +82,6 @@ alter table public.customers enable row level security;
 alter table public.jobs enable row level security;
 alter table public.review_requests enable row level security;
 alter table public.subscriptions enable row level security;
+
+grant usage on schema public to postgres, service_role;
+grant all on all tables in schema public to postgres, service_role;

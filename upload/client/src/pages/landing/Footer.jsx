@@ -44,7 +44,7 @@ export function Footer() {
         </div>
         <div>
           <h3 className="mb-3 font-semibold text-ink">Legal</h3>
-          <p>© {new Date().getFullYear()} ReviewFlow</p>
+          <p>© {new Date().getFullYear()} starywrld</p>
         </div>
       </div>
     </footer>

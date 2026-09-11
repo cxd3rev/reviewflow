@@ -1,24 +1,18 @@
 import { Link } from "react-router-dom";
+import icon from "../../assets/icon.png";
+import logo from "../../assets/logo.png";
+import { APP_NAME } from "../../config/brand.js";
 
 export function BrandMark({ className = "h-9 w-9" }) {
-  return (
-    <img
-      src="/icon.png"
-      alt=""
-      className={`rounded-xl object-cover shadow-sm ring-1 ring-black/10 ${className}`}
-    />
-  );
+  return <img src={icon} alt="" className={`object-contain ${className}`} />;
 }
 
-export function Logo({ to = "/", variant = "lockup" }) {
+export function Logo({ to = "/", variant = "wordmark" }) {
   const content =
-    variant === "wordmark" ? (
-      <img src="/logo.png" alt="ReviewFlow" className="h-8 w-auto md:h-9" />
+    variant === "mark" ? (
+      <BrandMark className="h-8 w-8" />
     ) : (
-      <span className="inline-flex items-center gap-2.5">
-        <BrandMark className="h-8 w-8" />
-        <span className="text-[15px] font-semibold tracking-tight text-ink">ReviewFlow</span>
-      </span>
+      <img src={logo} alt={APP_NAME} className="h-8 w-auto md:h-9" />
     );
 
   if (!to) return content;

@@ -13,7 +13,7 @@ export function HowItWorks() {
           {[
             ["1", "Add your review link", "Paste your Google review URL — or any other review page."],
             ["2", "Add the customer & job", "Keep a simple list of who you worked for and what you did."],
-            ["3", "Mark the job completed", "ReviewFlow waits your chosen delay, then sends the email."],
+            ["3", "Mark the job completed", "starywrld waits your chosen delay, then sends the email."],
             ["4", "They tap Leave a Review", "The button opens your review page. You see sent vs waiting."],
           ].map((item) => (
             <div key={item[0]} className="rounded-2xl border border-edge bg-white p-6 shadow-sm">

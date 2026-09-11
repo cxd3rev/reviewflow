@@ -12,16 +12,21 @@ export async function createStore() {
   if (supabaseKeysReady()) {
     const store = createSupabaseStore();
     const tablesOk = await store.pingTables();
-    if (!tablesOk) {
-      console.error(
-        "Supabase is connected, but tables are missing. Open the Supabase SQL editor and run supabase/schema.sql."
-      );
-    } else {
+    store.supabaseTablesOk = tablesOk;
+    if (tablesOk) {
       console.log("Using Supabase as the database host.");
+      return store;
     }
-    return store;
+    console.error(
+      "Supabase is connected, but tables are missing. Run supabase/schema.sql in the SQL editor. Falling back to local SQLite until then."
+    );
+    const sqlite = createSqliteStore(openDatabase());
+    sqlite.supabaseTablesOk = false;
+    return sqlite;
   }
 
   console.log("Using local SQLite (set SUPABASE_SECRET_KEY to use Supabase).");
-  return createSqliteStore(openDatabase());
+  const sqlite = createSqliteStore(openDatabase());
+  sqlite.supabaseTablesOk = null;
+  return sqlite;
 }

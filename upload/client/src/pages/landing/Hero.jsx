@@ -15,7 +15,7 @@ export function Hero() {
           <span className="text-brand-500">Less chasing.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-muted md:text-xl">
-          Mark a job complete. ReviewFlow emails the customer and sends them to your Google review page.
+          Mark a job complete. starywrld emails the customer and sends them to your Google review page.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link to="/signup" className="btn-cta">

@@ -8,7 +8,7 @@ export function Compare() {
         </p>
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-edge bg-slate-50/80 p-8">
-            <h3 className="text-xl font-semibold text-slate-700">Without ReviewFlow</h3>
+            <h3 className="text-xl font-semibold text-slate-700">Without starywrld</h3>
             <p className="mt-1 text-sm text-muted">Reviews left to chance</p>
             <ul className="mt-6 space-y-3 text-slate-600">
               {[
@@ -25,7 +25,7 @@ export function Compare() {
             </ul>
           </div>
           <div className="rounded-2xl border border-brand-100 bg-brand-50/40 p-8 shadow-sm">
-            <h3 className="text-xl font-semibold text-brand-700">With ReviewFlow</h3>
+            <h3 className="text-xl font-semibold text-brand-700">With starywrld</h3>
             <p className="mt-1 text-sm text-brand-600">Every completed job gets a follow-up</p>
             <ul className="mt-6 space-y-3 text-slate-700">
               {[

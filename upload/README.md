@@ -1,8 +1,8 @@
-# ReviewFlow
+# starywrld
 
 Automatically request reviews after completed jobs.
 
-ReviewFlow is a small SaaS for local service businesses — painters, plumbers, cleaners, and similar trades. After a job is marked completed, it schedules an email asking the customer to leave a review and sends them to the business’s Google (or other) review page.
+starywrld is a small SaaS for local service businesses — painters, plumbers, cleaners, and similar trades. After a job is marked completed, it schedules an email asking the customer to leave a review and sends them to the business’s Google (or other) review page.
 
 Price: **€29,99/month**, with a **7-day free trial**.
 
@@ -59,11 +59,42 @@ That creates an `upload` folder with **only source files** (no `node_modules`).
 - `upload/server`
 - `upload/scripts`
 
-Then add the files next to them: `package.json`, `README.md`, `.gitignore`, `.env.example`.
+Then add the files next to them: `package.json`, `package-lock.json`, `README.md`, `.gitignore`, `.env.example`.
+
+`node_modules` cannot be split into smaller files. It is thousands of third-party packages. GitHub will reject it, and the app does not need it on GitHub. After you (or anyone else) download the repo, run `npm install` once — that rebuilds `node_modules` on the computer.
 
 Do **not** drag the original `client`, `server`, or `node_modules` folders — those still contain the huge install files on your PC.
 
 3. Keep working in this project as usual (`npm run dev`). Use `npm run pack:github` again whenever you want a fresh copy to upload.
+
+## GitHub Pages (the website URL)
+
+GitHub Pages can only host **static files**. That is why you saw a 404: the repo had no `index.html` at the site root. The login/API part still needs a computer running `npm run dev` (or another host). Pages can show the starywrld website UI.
+
+1. On your computer run:
+
+```bash
+npm run build:pages
+npm run pack:github
+```
+
+2. Upload these onto GitHub (from the `upload` folder):
+
+- `index.html` (this file must sit at the **root** of the repo)
+- the `docs` folder
+- `.github` if you want automatic rebuilds
+
+3. In the GitHub repo open **Settings → Pages**:
+
+- Source: **Deploy from a branch**
+- Branch: `main` (or `master`)
+- Folder: **/docs**
+
+Save, wait a minute, then open the Pages URL again.
+
+If Pages is still set to **/ (root)**, the root `index.html` will send visitors to `/docs/`.
+
+Login and review emails will not work on GitHub Pages, because there is no Node server there. Use `npm run dev` on your computer for the full app.
 
 ## How to install
 
@@ -93,7 +124,7 @@ npm run seed
 
 Demo login:
 
-- Email: `aron@reviewflow.test`
+- Email: `aron@starywrld.test`
 - Password: `Demo1234!`
 
 ## Environment variables
@@ -112,10 +143,16 @@ See `.env.example`.
 | `EMAIL_LOG_ONLY` | If `true`, print emails to the server console instead of sending |
 | `DEMO_MODE` | Unused by the server at runtime; seed script is the demo path |
 | `CLIENT_ORIGIN` | Frontend origin for CORS and Stripe return URLs |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key |
+| `SUPABASE_SECRET_KEY` | Supabase secret key (server only, never in the client) |
+| `SUPABASE_JWKS_URL` | JWKS URL for verifying Supabase user JWTs |
+| `VITE_SUPABASE_URL` | Same project URL, exposed to the Vite client |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Publishable key for the browser client (never the secret key) |
 
 ## How to configure Stripe
 
-1. Create a Stripe account and a Product named **ReviewFlow Pro**.
+1. Create a Stripe account and a Product named **starywrld Pro**.
 2. Add a recurring price of **€29,99 / month**.
 3. Copy the price id into `STRIPE_PRICE_ID`.
 4. Put your secret key in `STRIPE_SECRET_KEY`.
@@ -125,6 +162,18 @@ See `.env.example`.
 8. Enable the Customer Portal in the Stripe Dashboard so users can cancel.
 
 Until Stripe is configured, new accounts still get a 7-day trial and can use the product.
+
+## How to configure Supabase
+
+1. Copy the `SUPABASE_*` and `VITE_SUPABASE_*` lines from `.env.example` into `.env`.
+2. Replace the placeholders with the values from your Supabase project (**Project Settings → API Keys**).
+3. Restart `npm run dev` so both Express and Vite reload env.
+4. Open http://localhost:3001/api/health — `supabase.configured` should be `true`.
+5. Sign in and open Settings — it should say the browser client is connected.
+
+Login for the app is still starywrld email/password in SQLite. The server uses `@supabase/server`; the Vite app uses `@supabase/supabase-js` in `client/src/lib/supabase.js`. Do not put `SUPABASE_SECRET_KEY` in GitHub or in any `VITE_` variable.
+
+If this secret was pasted in chat, rotate it in the Supabase dashboard and put the new value only in `.env`.
 
 ## How to configure email
 

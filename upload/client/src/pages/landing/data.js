@@ -15,12 +15,12 @@ export const trades = [
 
 export const faqs = [
   {
-    q: "How does ReviewFlow work?",
-    a: "After you mark a job as completed, ReviewFlow waits for your chosen delay and emails the customer a review request with a button to your Google (or other) review page.",
+    q: "How does starywrld work?",
+    a: "After you mark a job as completed, starywrld waits for your chosen delay and emails the customer a review request with a button to your Google (or other) review page.",
   },
   {
     q: "Do I need a Google Business Profile?",
-    a: "You can use any review URL: Google, Facebook, your website, or another platform. ReviewFlow simply sends customers there.",
+    a: "You can use any review URL: Google, Facebook, your website, or another platform. starywrld simply sends customers there.",
   },
   {
     q: "How are review requests sent?",
@@ -28,7 +28,7 @@ export const faqs = [
   },
   {
     q: "What if a customer has no email?",
-    a: "ReviewFlow will not try to send a request. You'll see a clear message so you can add an email later.",
+    a: "starywrld will not try to send a request. You'll see a clear message so you can add an email later.",
   },
   {
     q: "How long does setup take?",
@@ -36,6 +36,6 @@ export const faqs = [
   },
   {
     q: "Is there a free trial?",
-    a: `Yes. New accounts get 7 days free. After that, ReviewFlow Pro is ${PRICE_PER_MONTH}. Cancel anytime.`,
+    a: `Yes. New accounts get 7 days free. After that, starywrld Pro is ${PRICE_PER_MONTH}. Cancel anytime.`,
   },
 ];

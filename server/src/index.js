@@ -63,6 +63,7 @@ app.get("/api/health", async (_req, res) => {
       configured: supabase.configured,
       url: supabase.url,
       authOk: supabase.authOk,
+      tablesOk: db.supabaseTablesOk,
       error: supabase.error,
     },
   });

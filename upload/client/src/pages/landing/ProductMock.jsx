@@ -6,7 +6,7 @@ export function ProductMock() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-          <span className="ml-3 text-xs font-medium text-slate-400">ReviewFlow dashboard</span>
+          <span className="ml-3 text-xs font-medium text-slate-400">starywrld dashboard</span>
         </div>
         <div className="grid gap-0 md:grid-cols-5">
           <div className="hidden border-r border-slate-100 bg-slate-50/70 p-5 md:block">
