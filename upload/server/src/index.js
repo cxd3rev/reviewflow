@@ -15,6 +15,7 @@ import { dashboardRoutes } from "./routes/dashboard.js";
 import { jobRoutes } from "./routes/jobs.js";
 import { requestRoutes } from "./routes/requests.js";
 import { startScheduler } from "./services/scheduler.js";
+import { attachSupabase, supabaseEnvStatus } from "./services/supabase.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -48,9 +49,15 @@ app.post(
 );
 
 app.use(express.json({ limit: "100kb" }));
+app.use(attachSupabase);
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "reviewflow" });
+  const supabase = supabaseEnvStatus();
+  res.json({
+    ok: true,
+    service: "starywrld",
+    supabase: { configured: supabase.configured, url: supabase.url },
+  });
 });
 
 app.use("/api/auth", authRoutes(db));
@@ -81,6 +88,6 @@ app.use((err, _req, res, _next) => {
 
 const port = Number(process.env.PORT || 3001);
 app.listen(port, () => {
-  console.log(`ReviewFlow API running on http://localhost:${port}`);
+  console.log(`starywrld API running on http://localhost:${port}`);
   startScheduler(db);
 });

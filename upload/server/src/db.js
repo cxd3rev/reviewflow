@@ -26,7 +26,7 @@ export function withTransaction(db, fn) {
 }
 
 export function openDatabase() {
-  const relative = process.env.DATABASE_URL || "./server/database/reviewflow.sqlite";
+  const relative = process.env.DATABASE_URL || "./server/database/starywrld.sqlite";
   const dbPath = path.isAbsolute(relative)
     ? relative
     : path.resolve(__dirname, "../..", relative.replace(/^\.\//, ""));

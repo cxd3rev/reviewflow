@@ -20,10 +20,10 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const db = openDatabase();
-const email = "aron@reviewflow.test";
+const email = "aron@starywrld.test";
 const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
 if (existing) {
-  console.log("Demo account already exists: aron@reviewflow.test / Demo1234!");
+  console.log("Demo account already exists: aron@starywrld.test / Demo1234!");
   process.exit(0);
 }
 
@@ -123,5 +123,5 @@ withTransaction(db, () => {
 });
 
 console.log("Demo data ready.");
-console.log("Login: aron@reviewflow.test");
+console.log("Login: aron@starywrld.test");
 console.log("Password: Demo1234!");

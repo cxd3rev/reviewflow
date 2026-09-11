@@ -42,7 +42,7 @@ export function buildReviewEmail({ business, customer, reviewUrl }) {
             </tr>
             <tr>
               <td style="color:#78716c;font-size:13px;padding-top:20px;font-family:Arial,sans-serif;">
-                This message was sent by ReviewFlow on behalf of ${escapeHtml(businessName)}.
+                This message was sent by starywrld on behalf of ${escapeHtml(businessName)}.
               </td>
             </tr>
           </table>
