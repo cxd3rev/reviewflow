@@ -10,6 +10,7 @@
     "dev:server": "npm run dev -w reviewflow-server",
     "dev:client": "npm run dev -w reviewflow-client",
     "build": "npm run build -w reviewflow-client",
+    "build:pages": "node scripts/build-pages.js",
     "start": "npm run start -w reviewflow-server",
     "seed": "npm run seed -w reviewflow-server",
     "clean:deps": "node scripts/clean-deps.js",

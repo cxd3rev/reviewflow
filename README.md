@@ -67,6 +67,35 @@ Do **not** drag the original `client`, `server`, or `node_modules` folders — t
 
 3. Keep working in this project as usual (`npm run dev`). Use `npm run pack:github` again whenever you want a fresh copy to upload.
 
+## GitHub Pages (the website URL)
+
+GitHub Pages can only host **static files**. That is why you saw a 404: the repo had no `index.html` at the site root. The login/API part still needs a computer running `npm run dev` (or another host). Pages can show the ReviewFlow website UI.
+
+1. On your computer run:
+
+```bash
+npm run build:pages
+npm run pack:github
+```
+
+2. Upload these onto GitHub (from the `upload` folder):
+
+- `index.html` (this file must sit at the **root** of the repo)
+- the `docs` folder
+- `.github` if you want automatic rebuilds
+
+3. In the GitHub repo open **Settings → Pages**:
+
+- Source: **Deploy from a branch**
+- Branch: `main` (or `master`)
+- Folder: **/docs**
+
+Save, wait a minute, then open the Pages URL again.
+
+If Pages is still set to **/ (root)**, the root `index.html` will send visitors to `/docs/`.
+
+Login and review emails will not work on GitHub Pages, because there is no Node server there. Use `npm run dev` on your computer for the full app.
+
 ## How to install
 
 You need Node.js 22+ (Node 24 is fine).
