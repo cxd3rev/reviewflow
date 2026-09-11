@@ -1,0 +1,28 @@
+import { Audience } from "./Audience.jsx";
+import { Compare } from "./Compare.jsx";
+import { Faq } from "./Faq.jsx";
+import { Features } from "./Features.jsx";
+import { ClosingCta, Footer } from "./Footer.jsx";
+import { Header } from "./Header.jsx";
+import { Hero } from "./Hero.jsx";
+import { HowItWorks } from "./HowItWorks.jsx";
+import { Pricing } from "./Pricing.jsx";
+import { ProductMock } from "./ProductMock.jsx";
+
+export default function Landing() {
+  return (
+    <div className="bg-white text-ink">
+      <Header />
+      <Hero />
+      <ProductMock />
+      <HowItWorks />
+      <Features />
+      <Audience />
+      <Compare />
+      <Pricing />
+      <Faq />
+      <ClosingCta />
+      <Footer />
+    </div>
+  );
+}
