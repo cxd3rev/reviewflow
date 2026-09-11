@@ -147,6 +147,8 @@ See `.env.example`.
 | `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key |
 | `SUPABASE_SECRET_KEY` | Supabase secret key (server only, never in the client) |
 | `SUPABASE_JWKS_URL` | JWKS URL for verifying Supabase user JWTs |
+| `VITE_SUPABASE_URL` | Same project URL, exposed to the Vite client |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Publishable key for the browser client (never the secret key) |
 
 ## How to configure Stripe
 
@@ -163,12 +165,13 @@ Until Stripe is configured, new accounts still get a 7-day trial and can use the
 
 ## How to configure Supabase
 
-1. Copy the four `SUPABASE_*` lines from `.env.example` into `.env`.
+1. Copy the `SUPABASE_*` and `VITE_SUPABASE_*` lines from `.env.example` into `.env`.
 2. Replace the placeholders with the values from your Supabase project (**Project Settings → API Keys**).
-3. Restart `npm run dev`.
+3. Restart `npm run dev` so both Express and Vite reload env.
 4. Open http://localhost:3001/api/health — `supabase.configured` should be `true`.
+5. Sign in and open Settings — it should say the browser client is connected.
 
-Login for the app is still ReviewFlow email/password in SQLite. The server now has a Supabase admin client (`req.supabaseAdmin`) for Auth/database work. Do not put `SUPABASE_SECRET_KEY` in GitHub or the frontend.
+Login for the app is still ReviewFlow email/password in SQLite. The server uses `@supabase/server`; the Vite app uses `@supabase/supabase-js` in `client/src/lib/supabase.js`. Do not put `SUPABASE_SECRET_KEY` in GitHub or in any `VITE_` variable.
 
 If this secret was pasted in chat, rotate it in the Supabase dashboard and put the new value only in `.env`.
 

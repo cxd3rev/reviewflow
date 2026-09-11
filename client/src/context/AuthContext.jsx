@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { api, getToken, setToken } from "../lib/api.js";
+import { pingSupabase } from "../lib/supabase.js";
 
 const AuthContext = createContext(null);
 
@@ -38,6 +39,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     refresh();
+    pingSupabase().then((result) => {
+      if (result.configured && !result.ok) {
+        console.error("Supabase:", result.error);
+      }
+    });
   }, []);
 
   async function loginWithPayload(data) {

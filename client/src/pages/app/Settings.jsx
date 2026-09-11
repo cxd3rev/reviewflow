@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/api.js";
+import { pingSupabase } from "../../lib/supabase.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
 import { applyTemplate, delayLabel } from "../../utils/format.js";
@@ -23,6 +24,21 @@ export default function Settings() {
   const [account, setAccount] = useState({ name: user?.name || "", email: user?.email || "", password: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [supabaseStatus, setSupabaseStatus] = useState("Checking Supabase…");
+
+  useEffect(() => {
+    pingSupabase().then((result) => {
+      if (!result.configured) {
+        setSupabaseStatus("Supabase browser client is not configured.");
+        return;
+      }
+      if (!result.ok) {
+        setSupabaseStatus(`Supabase error: ${result.error}`);
+        return;
+      }
+      setSupabaseStatus("Supabase browser client is connected (project chfjwzdcgzfswtqyqveu).");
+    });
+  }, []);
 
   const preview = applyTemplate(biz.emailMessage, {
     customer_name: "Jane Customer",
@@ -57,6 +73,7 @@ export default function Settings() {
   return (
     <div className="max-w-2xl">
       <PageHeader title="Settings" description="Your business, review link, and the email customers receive." />
+      <p className="mb-4 text-sm text-muted">{supabaseStatus}</p>
       {message && <p className="alert-ok mb-4">{message}</p>}
       {error && <p className="alert-error mb-4">{error}</p>}
 
