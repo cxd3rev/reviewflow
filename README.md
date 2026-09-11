@@ -143,6 +143,10 @@ See `.env.example`.
 | `EMAIL_LOG_ONLY` | If `true`, print emails to the server console instead of sending |
 | `DEMO_MODE` | Unused by the server at runtime; seed script is the demo path |
 | `CLIENT_ORIGIN` | Frontend origin for CORS and Stripe return URLs |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key |
+| `SUPABASE_SECRET_KEY` | Supabase secret key (server only, never in the client) |
+| `SUPABASE_JWKS_URL` | JWKS URL for verifying Supabase user JWTs |
 
 ## How to configure Stripe
 
@@ -156,6 +160,17 @@ See `.env.example`.
 8. Enable the Customer Portal in the Stripe Dashboard so users can cancel.
 
 Until Stripe is configured, new accounts still get a 7-day trial and can use the product.
+
+## How to configure Supabase
+
+1. Copy the four `SUPABASE_*` lines from `.env.example` into `.env`.
+2. Replace the placeholders with the values from your Supabase project (**Project Settings → API Keys**).
+3. Restart `npm run dev`.
+4. Open http://localhost:3001/api/health — `supabase.configured` should be `true`.
+
+Login for the app is still ReviewFlow email/password in SQLite. The server now has a Supabase admin client (`req.supabaseAdmin`) for Auth/database work. Do not put `SUPABASE_SECRET_KEY` in GitHub or the frontend.
+
+If this secret was pasted in chat, rotate it in the Supabase dashboard and put the new value only in `.env`.
 
 ## How to configure email
 
