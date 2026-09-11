@@ -59,7 +59,9 @@ That creates an `upload` folder with **only source files** (no `node_modules`).
 - `upload/server`
 - `upload/scripts`
 
-Then add the files next to them: `package.json`, `README.md`, `.gitignore`, `.env.example`.
+Then add the files next to them: `package.json`, `package-lock.json`, `README.md`, `.gitignore`, `.env.example`.
+
+`node_modules` cannot be split into smaller files. It is thousands of third-party packages. GitHub will reject it, and the app does not need it on GitHub. After you (or anyone else) download the repo, run `npm install` once — that rebuilds `node_modules` on the computer.
 
 Do **not** drag the original `client`, `server`, or `node_modules` folders — those still contain the huge install files on your PC.
 
