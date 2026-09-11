@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../../lib/api.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
@@ -17,16 +17,16 @@ export default function Requests() {
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState("");
 
-  async function load(next = status) {
+  const load = useCallback(async (next = status) => {
     const data = await api(`/api/requests?status=${next}`);
     setRequests(data.requests);
-  }
+  }, [status]);
 
   useEffect(() => {
     load(status).catch((err) => setError(err.message));
     const timer = setInterval(() => load(status).catch(() => {}), 8000);
     return () => clearInterval(timer);
-  }, [status]);
+  }, [load, status]);
 
   async function cancel(request) {
     await api(`/api/requests/${request.id}/cancel`, { method: "POST" });

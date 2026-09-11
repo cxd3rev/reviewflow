@@ -1,4 +1,4 @@
-export function PageHeader({ title, description, action }) {
+export function PageHeader({ title, description, action = null }) {
   return (
     <div className="page-header">
       <div>

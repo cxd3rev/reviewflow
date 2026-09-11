@@ -21,7 +21,9 @@ export async function api(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = new Error(data.error || "Request failed.");
+    const error = /** @type {Error & { status?: number, code?: string }} */ (
+      new Error(data.error || "Request failed.")
+    );
     error.status = response.status;
     error.code = data.code;
     throw error;
