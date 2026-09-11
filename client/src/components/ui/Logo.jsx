@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import icon from "../../assets/icon.png";
+import logo from "../../assets/logo.png";
 
 export function BrandMark({ className = "h-9 w-9" }) {
   return (
     <img
-      src="/icon.png"
+      src={icon}
       alt=""
       className={`rounded-xl object-cover shadow-sm ring-1 ring-black/10 ${className}`}
     />
@@ -13,7 +15,7 @@ export function BrandMark({ className = "h-9 w-9" }) {
 export function Logo({ to = "/", variant = "lockup" }) {
   const content =
     variant === "wordmark" ? (
-      <img src="/logo.png" alt="ReviewFlow" className="h-8 w-auto md:h-9" />
+      <img src={logo} alt="ReviewFlow" className="h-8 w-auto md:h-9" />
     ) : (
       <span className="inline-flex items-center gap-2.5">
         <BrandMark className="h-8 w-8" />
