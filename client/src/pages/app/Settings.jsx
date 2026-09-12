@@ -6,11 +6,14 @@ import { deleteExampleRow, insertExampleRow, listExampleRows } from "../../lib/e
 import { useAuth } from "../../context/AuthContext.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
 import { applyTemplate, delayLabel } from "../../utils/format.js";
+import { LanguageSwitcher } from "../../components/ui/LanguageSwitcher.jsx";
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 const DELAYS = [0, 60, 1440, 2880, 4320];
 const TYPES = ["Plumber", "Electrician", "Cleaner", "Painter", "Mechanic", "Contractor", "Landscaper", "Barber", "Beauty", "Handyman", "Other"];
 
 export default function Settings() {
+  const { t } = useI18n();
   const { user, business, entitlement, supabaseUser, supabaseAuthError, setBusiness, refresh } = useAuth();
   const [biz, setBiz] = useState({
     name: business?.name || "",
@@ -64,7 +67,7 @@ export default function Settings() {
     try {
       const data = await api("/api/business", { method: "PUT", body: JSON.stringify(biz) });
       setBusiness(data.business);
-      setMessage("Settings saved.");
+      setMessage(t("settings.saved"));
     } catch (err) {
       setError(err.message);
     }
@@ -77,7 +80,7 @@ export default function Settings() {
       await api("/api/auth/account", { method: "PUT", body: JSON.stringify(account) });
       await refresh();
       setAccount({ ...account, password: "" });
-      setMessage("Account updated.");
+      setMessage(t("settings.accountUpdated"));
     } catch (err) {
       setError(err.message);
     }
@@ -109,7 +112,14 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="Instellingen" description="Je bedrijf, reviewlink en de e-mail die klanten ontvangen." />
+      <PageHeader title={t("settings.title")} description={t("settings.desc")} />
+      <div className="card mb-4 space-y-3 p-6">
+        <div>
+          <h2 className="section-title">{t("common.language")}</h2>
+          <p className="section-help">{t("settings.languageHelp")}</p>
+        </div>
+        <LanguageSwitcher />
+      </div>
       <p className="mb-4 text-sm text-muted">{supabaseStatus}</p>
       {message && <p className="alert-ok mb-4">{message}</p>}
       {error && <p className="alert-error mb-4">{error}</p>}

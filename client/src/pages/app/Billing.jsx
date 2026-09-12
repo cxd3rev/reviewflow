@@ -4,8 +4,10 @@ import { api } from "../../lib/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
 import { PRICE_EUR, PRICE_PER_MONTH } from "../../config/pricing.js";
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export default function Billing() {
+  const { t } = useI18n();
   const { entitlement, billing, refresh } = useAuth();
   const [params] = useSearchParams();
   const [error, setError] = useState("");
@@ -58,7 +60,7 @@ export default function Billing() {
   }
 
   async function cancelLocal() {
-    if (!confirm("Cancel starywrld Pro?")) return;
+    if (!confirm(t("billing.confirmCancel"))) return;
     setBusy(true);
     setError("");
     try {
@@ -71,47 +73,43 @@ export default function Billing() {
     }
   }
 
-  const planLabel = entitlement?.plan === "pro" ? "starywrld Pro" : entitlement?.trialActive ? "Free trial" : "No active plan";
+  const planLabel = entitlement?.plan === "pro" ? t("billing.pro") : entitlement?.trialActive ? t("billing.trial") : t("billing.none");
   const localPro = entitlement?.plan === "pro" && String(entitlement?.stripeSubscriptionId || "").startsWith("local_");
   const stripeReady = billing?.stripeConfigured;
 
   return (
     <div className="max-w-lg">
-      <PageHeader title="Billing" description="One plan. Cancel whenever you like." />
+      <PageHeader title={t("billing.title")} description={t("billing.desc")} />
 
       {params.get("checkout") === "success" && (
-        <p className="alert-ok mb-4">Subscription started. It can take a few seconds to update.</p>
+        <p className="alert-ok mb-4">{t("billing.success")}</p>
       )}
       {error && <p className="alert-error mb-4">{error}</p>}
 
       {!stripeReady && (
-        <p className="alert-warn mb-4">
-          Real card payments need your Stripe secret key in <code className="font-medium">.env</code> as{" "}
-          <code className="font-medium">STRIPE_SECRET_KEY</code> (starts with sk_test_ or sk_live_). Until then,
-          Subscribe only activates Pro on this computer.
-        </p>
+        <p className="alert-warn mb-4">{t("billing.stripeWarn")}</p>
       )}
 
       <div className="card p-8">
         <div className="text-sm font-semibold text-brand-600">starywrld Pro</div>
         <div className="mt-2 flex items-baseline gap-1">
           <span className="display text-4xl font-bold tracking-tight">{PRICE_EUR}</span>
-          <span className="text-muted">/month</span>
+          <span className="text-muted">{t("common.perMonth")}</span>
         </div>
         <dl className="mt-5 space-y-2 text-sm">
           <div className="flex justify-between border-b border-edge py-2">
-            <dt className="text-muted">Current plan</dt>
+            <dt className="text-muted">{t("billing.current")}</dt>
             <dd>{planLabel}</dd>
           </div>
           <div className="flex justify-between border-b border-edge py-2">
-            <dt className="text-muted">Status</dt>
+            <dt className="text-muted">{t("common.status")}</dt>
             <dd className="capitalize">{entitlement?.status || "none"}</dd>
           </div>
           {entitlement?.trialActive && (
             <div className="flex justify-between py-2">
-              <dt className="text-muted">Trial ends</dt>
+              <dt className="text-muted">{t("billing.trialEnds")}</dt>
               <dd>
-                in {entitlement.daysLeft} day{entitlement.daysLeft === 1 ? "" : "s"}
+                {entitlement.daysLeft === 1 ? t("billing.inDay") : t("billing.inDays", { n: entitlement.daysLeft })}
               </dd>
             </div>
           )}
@@ -119,17 +117,17 @@ export default function Billing() {
         <div className="mt-5 flex flex-col gap-2">
           {entitlement?.plan !== "pro" && (
             <button className="btn-primary" onClick={checkout} disabled={busy}>
-              {stripeReady ? `Subscribe for ${PRICE_PER_MONTH}` : "Activate Pro (local test)"}
+              {stripeReady ? t("billing.subscribe", { price: PRICE_PER_MONTH }) : t("billing.activate")}
             </button>
           )}
           {entitlement?.stripeCustomerId && stripeReady && (
             <button className="btn-secondary" onClick={portal} disabled={busy}>
-              Manage or cancel
+              {t("billing.manage")}
             </button>
           )}
           {localPro && (
             <button className="btn-secondary" onClick={cancelLocal} disabled={busy}>
-              Cancel subscription
+              {t("billing.cancelSub")}
             </button>
           )}
         </div>

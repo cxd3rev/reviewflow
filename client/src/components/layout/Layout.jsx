@@ -1,19 +1,9 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Logo } from "../ui/Logo.jsx";
+import { LanguageSwitcher } from "../ui/LanguageSwitcher.jsx";
 import { PRICE_PER_MONTH } from "../../config/pricing.js";
 import { useAuth } from "../../context/AuthContext.jsx";
-
-const workLinks = [
-  { to: "/app", label: "Home", end: true, icon: "home" },
-  { to: "/app/customers", label: "Klanten", icon: "users" },
-  { to: "/app/jobs", label: "Jobs", icon: "briefcase" },
-  { to: "/app/requests", label: "Verzoeken", icon: "mail" },
-];
-
-const accountLinks = [
-  { to: "/app/settings", label: "Instellingen", icon: "cog" },
-  { to: "/app/billing", label: "Facturatie", icon: "card" },
-];
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 function Icon({ name }) {
   const paths = {
@@ -60,7 +50,19 @@ function initials(name = "") {
 
 export default function Layout() {
   const { user, business, entitlement, logout } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
+
+  const workLinks = [
+    { to: "/app", label: t("nav.home"), end: true, icon: "home" },
+    { to: "/app/customers", label: t("nav.customers"), icon: "users" },
+    { to: "/app/jobs", label: t("nav.jobs"), icon: "briefcase" },
+    { to: "/app/requests", label: t("nav.requests"), icon: "mail" },
+  ];
+  const accountLinks = [
+    { to: "/app/settings", label: t("nav.settings"), icon: "cog" },
+    { to: "/app/billing", label: t("nav.billing"), icon: "card" },
+  ];
 
   async function handleLogout() {
     await logout();
@@ -83,9 +85,10 @@ export default function Layout() {
           </div>
         </nav>
         <div className="border-t border-white/10 px-5 py-4">
+          <LanguageSwitcher className="mb-3" />
           <p className="truncate text-sm font-medium text-white">{user?.name}</p>
           <button className="mt-1 text-sm text-zinc-500 hover:text-white" onClick={handleLogout}>
-            Log out
+            {t("common.logOut")}
           </button>
         </div>
       </aside>
@@ -101,14 +104,17 @@ export default function Layout() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
               </svg>
             </span>
-            <input className="input max-w-sm pl-9" type="search" placeholder="Zoeken…" aria-label="Zoeken" />
+            <input className="input max-w-sm pl-9" type="search" placeholder={t("common.search")} aria-label={t("common.search")} />
           </label>
           <div className="ml-auto flex items-center gap-3">
+            <div className="md:hidden">
+              <LanguageSwitcher />
+            </div>
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white" title={user?.name}>
               {initials(user?.name)}
             </div>
             <button className="text-sm text-zinc-500 md:hidden" onClick={handleLogout}>
-              Log out
+              {t("common.logOut")}
             </button>
           </div>
         </header>
@@ -132,17 +138,17 @@ export default function Layout() {
 
         {entitlement?.trialActive && (
           <div className="border-b border-white/10 bg-white/5 px-4 py-2.5 text-center text-sm text-zinc-300">
-            Trial: {entitlement.daysLeft} day{entitlement.daysLeft === 1 ? "" : "s"} left.{" "}
+            {entitlement.daysLeft === 1 ? t("trial.leftOne") : t("trial.left", { n: entitlement.daysLeft })}{" "}
             <NavLink to="/app/billing" className="font-medium text-white underline">
-              Subscribe — {PRICE_PER_MONTH}
+              {t("trial.subscribe", { price: PRICE_PER_MONTH })}
             </NavLink>
           </div>
         )}
         {entitlement && !entitlement.allowed && (
           <div className="border-b border-red-500/20 bg-red-500/10 px-4 py-2.5 text-center text-sm text-red-200">
-            Your trial has ended.{" "}
+            {t("trial.ended")}{" "}
             <NavLink to="/app/billing" className="font-medium underline">
-              Subscribe to keep sending requests
+              {t("trial.keep")}
             </NavLink>
           </div>
         )}

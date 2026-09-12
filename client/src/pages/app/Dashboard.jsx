@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../../lib/api.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 import { formatRelative } from "../../utils/format.js";
 
 function firstName(name = "") {
@@ -16,6 +17,7 @@ function conversionRate(sent, completed) {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
@@ -26,27 +28,27 @@ export default function Dashboard() {
   }, []);
 
   if (error) return <p className="alert-error">{error}</p>;
-  if (!data) return <p className="text-sm text-muted">Loading…</p>;
+  if (!data) return <p className="text-sm text-muted">{t("common.loading")}</p>;
 
   const sent = data.stats.requestsSent;
   const stats = [
-    { label: "Verzonden", value: sent, trend: data.stats.thisMonth ? `+${data.stats.thisMonth}` : null },
-    { label: "Kliks", value: 0, trend: null },
-    { label: "Conversie", value: conversionRate(sent, data.stats.completedJobs), trend: null },
-    { label: "Reviews", value: data.stats.completedJobs, trend: null },
+    { label: t("dash.sent"), value: sent, trend: data.stats.thisMonth ? `+${data.stats.thisMonth}` : null },
+    { label: t("dash.clicks"), value: 0, trend: null },
+    { label: t("dash.conversion"), value: conversionRate(sent, data.stats.completedJobs), trend: null },
+    { label: t("dash.reviews"), value: data.stats.completedJobs, trend: null },
   ];
 
   return (
     <div>
       <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm text-zinc-500">Welcome back, {firstName(user?.name)}</p>
-          <h1 className="display mt-1 text-3xl font-semibold tracking-tight text-white">Dashboard</h1>
-          <p className="mt-1 text-sm text-zinc-400">Overzicht van je reviewverzoeken</p>
-          <p className="mt-1 text-sm text-zinc-500">Here&apos;s what&apos;s happening with your reviews today.</p>
+          <p className="text-sm text-zinc-500">{t("dash.welcome", { name: firstName(user?.name) })}</p>
+          <h1 className="display mt-1 text-3xl font-semibold tracking-tight text-white">{t("dash.title")}</h1>
+          <p className="mt-1 text-sm text-zinc-400">{t("dash.overview")}</p>
+          <p className="mt-1 text-sm text-zinc-500">{t("dash.today")}</p>
         </div>
         <Link to="/app/jobs" className="btn-primary">
-          New job
+          {t("dash.newJob")}
         </Link>
       </div>
 
@@ -64,26 +66,26 @@ export default function Dashboard() {
 
       <div className="card mt-6 overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3">
-          <h2 className="text-sm font-semibold text-white">Review verzoeken</h2>
+          <h2 className="text-sm font-semibold text-white">{t("dash.table")}</h2>
           <Link to="/app/requests" className="link">
-            Alles
+            {t("common.all")}
           </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Status</th>
-                <th>Klant</th>
-                <th>Kanaal</th>
-                <th>Datum</th>
+                <th>{t("common.status")}</th>
+                <th>{t("common.customer")}</th>
+                <th>{t("common.channel")}</th>
+                <th>{t("common.date")}</th>
               </tr>
             </thead>
             <tbody>
               {data.recentJobs.length === 0 && (
                 <tr>
                   <td className="text-muted" colSpan={4}>
-                    Nog geen verzoeken. Voeg een klant toe en rond een job af.
+                    {t("dash.empty")}
                   </td>
                 </tr>
               )}
@@ -97,8 +99,8 @@ export default function Dashboard() {
                     )}
                   </td>
                   <td className="font-medium text-white">{job.customerName}</td>
-                  <td className="text-zinc-400">E-mail</td>
-                  <td className="text-zinc-500">{formatRelative(job.requestScheduledAt || job.completedAt)}</td>
+                  <td className="text-zinc-400">{t("mock.email")}</td>
+                  <td className="text-zinc-500">{formatRelative(job.requestScheduledAt || job.completedAt, t)}</td>
                 </tr>
               ))}
             </tbody>

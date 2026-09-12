@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { APP_NAME } from "../../config/brand.js";
 
-const bust = "20260913a";
+const bust = "20260913d";
 const file = (name) => `${import.meta.env.BASE_URL}${name}?v=${bust}`;
 const LOGO_SRC = file("starywrld-logo.png");
 const ICON_SRC = file("starywrld-icon.png");

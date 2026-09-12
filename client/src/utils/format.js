@@ -5,19 +5,27 @@ export function formatDate(value) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function formatRelative(value) {
+export function formatRelative(value, t) {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   const diff = Date.now() - date.getTime();
   const mins = Math.round(diff / 60000);
-  if (Math.abs(mins) < 1) return "zojuist";
-  if (mins < 60 && mins >= 0) return `${mins} min geleden`;
+  const translate = t || ((key, vars) => {
+    if (key === "time.justNow") return "just now";
+    if (key === "time.minAgo") return `${vars.n} min ago`;
+    if (key === "time.hourAgo") return `${vars.n} hours ago`;
+    if (key === "time.yesterday") return "yesterday";
+    if (key === "time.daysAgo") return `${vars.n} days ago`;
+    return key;
+  });
+  if (Math.abs(mins) < 1) return translate("time.justNow");
+  if (mins < 60 && mins >= 0) return translate("time.minAgo", { n: mins });
   const hours = Math.round(mins / 60);
-  if (hours < 24 && hours >= 0) return `${hours} uur geleden`;
+  if (hours < 24 && hours >= 0) return translate("time.hourAgo", { n: hours });
   const days = Math.round(hours / 24);
-  if (days === 1) return "gisteren";
-  if (days < 7 && days >= 0) return `${days} dagen geleden`;
+  if (days === 1) return translate("time.yesterday");
+  if (days < 7 && days >= 0) return translate("time.daysAgo", { n: days });
   return formatDate(value);
 }
 

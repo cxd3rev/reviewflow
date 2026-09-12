@@ -1,4 +1,7 @@
+import { useI18n } from "../../i18n/LanguageContext.jsx";
+
 export function StatusBadge({ status, kind = "request" }) {
+  const { t } = useI18n();
   const styles =
     kind === "job"
       ? {
@@ -17,8 +20,19 @@ export function StatusBadge({ status, kind = "request" }) {
 
   const labels =
     kind === "job"
-      ? { scheduled: "Gepland", in_progress: "Bezig", completed: "Afgerond", cancelled: "Geannuleerd" }
-      : { scheduled: "Gepland", sending: "Gepland", sent: "Verzonden", failed: "Mislukt", cancelled: "Geannuleerd" };
+      ? {
+          scheduled: t("status.jobScheduled"),
+          in_progress: t("status.jobProgress"),
+          completed: t("status.jobCompleted"),
+          cancelled: t("status.jobCancelled"),
+        }
+      : {
+          scheduled: t("status.reqWaiting"),
+          sending: t("status.reqWaiting"),
+          sent: t("status.reqSent"),
+          failed: t("status.reqFailed"),
+          cancelled: t("status.reqCancelled"),
+        };
 
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status] || "bg-white/10 text-zinc-300"}`}>

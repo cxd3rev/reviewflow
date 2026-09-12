@@ -1,21 +1,23 @@
+import { useI18n } from "../../i18n/LanguageContext.jsx";
+
 export function HowItWorks() {
+  const { t } = useI18n();
+  const steps = [
+    ["1", t("how.s1t"), t("how.s1d")],
+    ["2", t("how.s2t"), t("how.s2d")],
+    ["3", t("how.s3t"), t("how.s3d")],
+    ["4", t("how.s4t"), t("how.s4d")],
+  ];
   return (
     <section id="how" className="border-t border-white/5 py-24">
       <div className="mx-auto max-w-6xl px-4">
-        <p className="text-center text-sm font-semibold uppercase tracking-wider text-zinc-500">How it works</p>
+        <p className="text-center text-sm font-semibold uppercase tracking-wider text-zinc-500">{t("how.eyebrow")}</p>
         <h2 className="display mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">
-          Set up once. Reviews run themselves.
+          {t("how.title")}
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-muted">
-          Four steps. Nothing extra to install on the job site.
-        </p>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-muted">{t("how.subtitle")}</p>
         <div className="mt-14 grid gap-6 md:grid-cols-4">
-          {[
-            ["1", "Add your review link", "Paste your Google review URL — or any other review page."],
-            ["2", "Add the customer & job", "Keep a simple list of who you worked for and what you did."],
-            ["3", "Mark the job completed", "starywrld waits your chosen delay, then sends the email."],
-            ["4", "They tap Leave a Review", "The button opens your review page. You see sent vs waiting."],
-          ].map((item) => (
+          {steps.map((item) => (
             <div key={item[0]} className="rounded-2xl border border-white/10 bg-surface p-6">
               <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold text-black">
                 {item[0]}

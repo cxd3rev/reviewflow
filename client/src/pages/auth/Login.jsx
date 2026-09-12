@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../lib/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { AuthShell } from "./AuthShell.jsx";
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export default function Login() {
   const { loginWithPayload } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -27,28 +29,27 @@ export default function Login() {
   }
 
   return (
-    <AuthShell title="Log in" subtitle="Use your work email to open your dashboard.">
+    <AuthShell title={t("auth.loginTitle")} subtitle={t("auth.loginSub")}>
       <form onSubmit={onSubmit} className="space-y-4">
         {error && <p className="alert-error">{error}</p>}
         <div>
-          <label className="label">Email</label>
+          <label className="label">{t("common.email")}</label>
           <input className="input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
         </div>
         <div>
-          <label className="label">Password</label>
+          <label className="label">{t("common.password")}</label>
           <input className="input" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
         </div>
         <button className="btn-primary w-full py-2.5" disabled={saving}>
-          {saving ? "Signing in…" : "Log in"}
+          {saving ? t("auth.signingIn") : t("common.logIn")}
         </button>
       </form>
       <p className="mt-5 text-center text-sm text-muted">
-        New here?{" "}
+        {t("auth.newHere")}{" "}
         <Link className="font-medium text-white" to="/signup">
-          Start free
+          {t("common.signup")}
         </Link>
       </p>
     </AuthShell>
   );
 }
-

@@ -3,19 +3,20 @@ import { api } from "../../lib/api.js";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
 import { formatDateTime } from "../../utils/format.js";
-
-const filters = [
-  { id: "all", label: "Alles" },
-  { id: "scheduled", label: "Gepland" },
-  { id: "sent", label: "Verzonden" },
-  { id: "failed", label: "Mislukt" },
-  { id: "cancelled", label: "Geannuleerd" },
-];
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export default function Requests() {
+  const { t } = useI18n();
   const [status, setStatus] = useState("all");
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState("");
+  const filters = [
+    { id: "all", label: t("common.all") },
+    { id: "scheduled", label: t("requests.waiting") },
+    { id: "sent", label: t("requests.sent") },
+    { id: "failed", label: t("requests.failed") },
+    { id: "cancelled", label: t("requests.cancelled") },
+  ];
 
   const load = useCallback(async (next = status) => {
     const data = await api(`/api/requests?status=${next}`);
@@ -35,10 +36,7 @@ export default function Requests() {
 
   return (
     <div>
-      <PageHeader
-        title="Review verzoeken"
-        description="E-mails die wachten, al verzonden zijn, of geannuleerd."
-      />
+      <PageHeader title={t("requests.title")} description={t("requests.desc")} />
 
       <div className="mb-4 flex flex-wrap gap-1 rounded-xl border border-white/10 bg-surface p-1">
         {filters.map((filter) => (
@@ -58,11 +56,11 @@ export default function Requests() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>Customer</th>
-              <th>Job</th>
-              <th>Scheduled</th>
-              <th>Sent</th>
-              <th>Status</th>
+              <th>{t("common.customer")}</th>
+              <th>{t("common.job")}</th>
+              <th>{t("requests.scheduled")}</th>
+              <th>{t("requests.sent")}</th>
+              <th>{t("common.status")}</th>
               <th></th>
             </tr>
           </thead>
@@ -70,7 +68,7 @@ export default function Requests() {
             {requests.length === 0 && (
               <tr>
                 <td className="text-muted" colSpan={6}>
-                  No requests in this view. Complete a job to create one.
+                  {t("requests.empty")}
                 </td>
               </tr>
             )}
@@ -87,7 +85,7 @@ export default function Requests() {
                 <td className="text-right">
                   {request.status === "scheduled" && (
                     <button className="text-sm font-medium text-red-400 hover:text-red-300" onClick={() => cancel(request)}>
-                      Cancel
+                      {t("common.cancel")}
                     </button>
                   )}
                 </td>

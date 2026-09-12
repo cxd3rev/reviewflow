@@ -5,10 +5,12 @@ import { Modal } from "../../components/ui/Modal.jsx";
 import { StatusBadge } from "../../components/ui/StatusBadge.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
 import { formatDate } from "../../utils/format.js";
+import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 const empty = { customerId: "", title: "", description: "", status: "scheduled" };
 
 export default function Jobs() {
+  const { t } = useI18n();
   const [jobs, setJobs] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [form, setForm] = useState(empty);
@@ -67,7 +69,7 @@ export default function Jobs() {
       setEditing(null);
       setConfirmComplete(null);
       if (result.reviewRequest?.error) setNotice(result.reviewRequest.error);
-      else if (result.reviewRequest?.ok) setNotice("Review request scheduled.");
+      else if (result.reviewRequest?.ok) setNotice(t("jobs.scheduled"));
       else setNotice("");
       await load();
     } catch (err) {
@@ -78,18 +80,18 @@ export default function Jobs() {
   return (
     <div>
       <PageHeader
-        title="Jobs"
-        description="When you mark a job completed, starywrld can email a review request."
+        title={t("jobs.title")}
+        description={t("jobs.desc")}
         action={
           <button className="btn-primary" onClick={openNew} disabled={customers.length === 0}>
-            Add job
+            {t("jobs.add")}
           </button>
         }
       />
 
       {customers.length === 0 && (
         <p className="alert-warn mb-4">
-          Add a customer first. <Link className="font-medium underline" to="/app/customers">Go to customers</Link>
+          {t("jobs.needCustomer")} <Link className="font-medium underline" to="/app/customers">{t("jobs.goCustomers")}</Link>
         </p>
       )}
       {notice && <p className="alert-ok mb-4">{notice}</p>}
@@ -98,10 +100,10 @@ export default function Jobs() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>Customer</th>
-              <th>Job</th>
-              <th>Completed</th>
-              <th>Status</th>
+              <th>{t("common.customer")}</th>
+              <th>{t("common.job")}</th>
+              <th>{t("jobs.completed")}</th>
+              <th>{t("common.status")}</th>
               <th></th>
             </tr>
           </thead>
@@ -109,7 +111,7 @@ export default function Jobs() {
             {jobs.length === 0 && (
               <tr>
                 <td className="text-muted" colSpan={5}>
-                  No jobs yet.
+                  {t("jobs.empty")}
                 </td>
               </tr>
             )}
@@ -126,7 +128,7 @@ export default function Jobs() {
                 </td>
                 <td className="text-right">
                   <button className="link" onClick={() => openEdit(job)}>
-                    Edit
+                    {t("common.edit")}
                   </button>
                 </td>
               </tr>
@@ -136,11 +138,11 @@ export default function Jobs() {
       </div>
 
       {editing && (
-        <Modal title={editing === "new" ? "Add job" : "Edit job"} onClose={() => setEditing(null)}>
+        <Modal title={editing === "new" ? t("jobs.add") : t("jobs.edit")} onClose={() => setEditing(null)}>
           <form onSubmit={save} className="space-y-3">
             {error && <p className="alert-error">{error}</p>}
             <div>
-              <label className="label">Customer</label>
+              <label className="label">{t("common.customer")}</label>
               <select className="input" value={form.customerId} onChange={(e) => setForm({ ...form, customerId: e.target.value })} required>
                 <option value="">Select customer</option>
                 {customers.map((customer) => (
@@ -152,41 +154,41 @@ export default function Jobs() {
               </select>
             </div>
             <div>
-              <label className="label">Job name</label>
+              <label className="label">{t("jobs.jobName")}</label>
               <input className="input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
             </div>
             <div>
-              <label className="label">Description</label>
+              <label className="label">{t("jobs.description")}</label>
               <textarea className="input" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </div>
             <div>
-              <label className="label">Status</label>
+              <label className="label">{t("common.status")}</label>
               <select className="input" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                <option value="scheduled">Scheduled</option>
-                <option value="in_progress">In progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="scheduled">{t("status.jobScheduled")}</option>
+                <option value="in_progress">{t("status.jobProgress")}</option>
+                <option value="completed">{t("status.jobCompleted")}</option>
+                <option value="cancelled">{t("status.jobCancelled")}</option>
               </select>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" className="btn-secondary" onClick={() => setEditing(null)}>
-                Cancel
+                {t("common.cancel")}
               </button>
-              <button className="btn-primary">Save</button>
+              <button className="btn-primary">{t("common.save")}</button>
             </div>
           </form>
         </Modal>
       )}
 
       {confirmComplete && (
-        <Modal title="Send a review request?" onClose={() => setConfirmComplete(null)}>
-          <p className="text-sm text-muted">We’ll email this customer using your delay setting in Settings.</p>
+        <Modal title={t("jobs.sendTitle")} onClose={() => setConfirmComplete(null)}>
+          <p className="text-sm text-muted">{t("jobs.sendHelp")}</p>
           <div className="mt-5 flex flex-col gap-2">
             <button className="btn-primary" onClick={() => submit({ ...confirmComplete, sendAutomatically: true })}>
-              Yes, send automatically
+              {t("jobs.sendYes")}
             </button>
             <button className="btn-secondary" onClick={() => submit({ ...confirmComplete, sendAutomatically: false })}>
-              Complete job without sending
+              {t("jobs.sendNo")}
             </button>
           </div>
         </Modal>
