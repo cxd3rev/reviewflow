@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Logo } from "../../components/ui/Logo.jsx";
+import { AyvWrldLogo, Logo } from "../../components/ui/Logo.jsx";
+import { APP_NAME, COMPANY_NAME } from "../../config/brand.js";
 import { PRICE_PER_MONTH } from "../../config/pricing.js";
 
 export function ClosingCta() {
@@ -24,7 +25,10 @@ export function Footer() {
     <footer className="border-t border-edge bg-white py-14 text-sm text-muted">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-4">
         <div>
-          <Logo variant="wordmark" />
+          <div className="flex flex-wrap items-center gap-5">
+            <Logo variant="wordmark" />
+            <AyvWrldLogo />
+          </div>
           <p className="mt-3 max-w-xs leading-6">Automatically request reviews after completed jobs.</p>
         </div>
         <div>
@@ -44,7 +48,9 @@ export function Footer() {
         </div>
         <div>
           <h3 className="mb-3 font-semibold text-ink">Legal</h3>
-          <p>© {new Date().getFullYear()} starywrld</p>
+          <p>
+            © {new Date().getFullYear()} {APP_NAME} by {COMPANY_NAME}
+          </p>
         </div>
       </div>
     </footer>
