@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useAuth } from "./context/AuthContext.jsx";
 import Layout from "./components/layout/Layout.jsx";
 import Billing from "./pages/app/Billing.jsx";
@@ -42,41 +43,44 @@ function Splash() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route
-        path="/login"
-        element={
-          <PublicOnly>
-            <Login />
-          </PublicOnly>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicOnly>
-            <Signup />
-          </PublicOnly>
-        }
-      />
-      <Route path="/onboarding" element={<OnboardingGate />} />
-      <Route
-        path="/app"
-        element={
-          <Protected>
-            <Layout />
-          </Protected>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="customers" element={<Customers />} />
-        <Route path="jobs" element={<Jobs />} />
-        <Route path="requests" element={<Requests />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="billing" element={<Billing />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/login"
+          element={
+            <PublicOnly>
+              <Login />
+            </PublicOnly>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicOnly>
+              <Signup />
+            </PublicOnly>
+          }
+        />
+        <Route path="/onboarding" element={<OnboardingGate />} />
+        <Route
+          path="/app"
+          element={
+            <Protected>
+              <Layout />
+            </Protected>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="jobs" element={<Jobs />} />
+          <Route path="requests" element={<Requests />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="billing" element={<Billing />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <SpeedInsights />
+    </>
   );
 }
