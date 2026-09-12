@@ -3,11 +3,14 @@ import express from "express";
 import { publicAppOrigin } from "../db.js";
 import { getEntitlement } from "../middleware/auth.js";
 import {
+  createCustomerPortalSession,
   billingInfo,
   findBusinessByStripeCustomer,
   findBusinessByStripeSubscription,
   getStripe,
+  hasStripeWebhookSecret,
   isStripeConfigured,
+  resolveStripePriceId,
   upsertSubscriptionFromStripe,
 } from "../services/stripe.js";
 
@@ -21,12 +24,14 @@ export function billingRoutes(db) {
 
   router.post("/checkout", async (req, res) => {
     const origin = publicAppOrigin();
-    const successUrl = `${origin}/app/billing?checkout=success`;
+    const successUrl = isStripeConfigured()
+      ? `${origin}/app/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/app/billing?checkout=success`;
 
     if (!isStripeConfigured()) {
       if (process.env.NODE_ENV === "production") {
         return res.status(503).json({
-          error: "Payments are not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID.",
+          error: "Payments are not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID or STRIPE_PRODUCT_ID.",
         });
       }
 
@@ -41,15 +46,16 @@ export function billingRoutes(db) {
     const stripe = getStripe();
     if (!stripe) {
       return res.status(503).json({
-        error: "Payments are not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID.",
+        error: "Payments are not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID or STRIPE_PRODUCT_ID.",
       });
     }
     const subscription = await db.getSubscriptionByBusinessId(req.business.id);
 
     try {
+      const priceId = await resolveStripePriceId(stripe);
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
-        line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+        line_items: [{ price: priceId, quantity: 1 }],
         success_url: successUrl,
         cancel_url: `${origin}/app/billing?checkout=cancelled`,
         customer: subscription?.stripe_customer_id || undefined,
@@ -69,6 +75,50 @@ export function billingRoutes(db) {
             ? "Could not start checkout."
             : error.message || "Could not start checkout.",
       });
+    }
+  });
+
+  router.post("/complete", async (req, res) => {
+    const stripe = getStripe();
+    if (!stripe) {
+      return res.status(503).json({ error: "Stripe is not configured." });
+    }
+
+    const sessionId = String(req.body?.sessionId || "");
+    if (!sessionId.startsWith("cs_")) {
+      return res.status(400).json({ error: "Missing checkout session." });
+    }
+
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ["subscription"],
+      });
+      const businessId = session.metadata?.businessId || session.client_reference_id;
+      if (businessId !== req.business.id) {
+        return res.status(403).json({ error: "This checkout does not belong to your account." });
+      }
+      if (session.status !== "complete" && session.payment_status === "unpaid") {
+        return res.status(400).json({ error: "Checkout is not complete yet." });
+      }
+
+      const subscriptionObject = session.subscription;
+      const subscription =
+        typeof subscriptionObject === "string"
+          ? await stripe.subscriptions.retrieve(subscriptionObject)
+          : subscriptionObject;
+      if (subscription) {
+        await upsertSubscriptionFromStripe(db, {
+          businessId: req.business.id,
+          customerId: session.customer,
+          subscription,
+        });
+      }
+
+      const next = await db.getSubscriptionByBusinessId(req.business.id);
+      res.json({ entitlement: getEntitlement(next), ...billingInfo() });
+    } catch (error) {
+      console.error("[stripe:complete]", error);
+      res.status(500).json({ error: "Could not confirm the subscription." });
     }
   });
 
@@ -106,10 +156,7 @@ export function billingRoutes(db) {
 
     try {
       const origin = publicAppOrigin();
-      const portal = await stripe.billingPortal.sessions.create({
-        customer: subscription.stripe_customer_id,
-        return_url: `${origin}/app/billing`,
-      });
+      const portal = await createCustomerPortalSession(stripe, subscription.stripe_customer_id, `${origin}/app/billing`);
       res.json({ url: portal.url });
     } catch (error) {
       console.error("[stripe:portal]", error);
@@ -124,6 +171,9 @@ export function stripeWebhookHandler(db) {
   return async (req, res) => {
     const stripe = getStripe();
     if (!stripe) return res.status(500).send("Stripe is not configured.");
+    if (!hasStripeWebhookSecret()) {
+      return res.status(500).send("STRIPE_WEBHOOK_SECRET is not set.");
+    }
 
     const signature = req.headers["stripe-signature"];
     let event;

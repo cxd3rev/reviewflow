@@ -47,16 +47,19 @@ export function getEntitlement(subscription) {
   const now = Date.now();
   const trialEnds = new Date(subscription.trial_ends_at).getTime();
   const trialActive = Number.isFinite(trialEnds) && trialEnds > now;
+  const subId = String(subscription.stripe_subscription_id || "");
+  const hasStripeSub = Boolean(subId) && !subId.startsWith("local_");
   const paidActive =
-    ["active", "trialing"].includes(subscription.status) && Boolean(subscription.stripe_subscription_id);
+    hasStripeSub && ["active", "trialing", "past_due"].includes(subscription.status);
+  const localPaid = subId.startsWith("local_") && ["active", "trialing"].includes(subscription.status);
   const daysLeft = trialActive ? Math.max(0, Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24))) : 0;
 
   return {
-    allowed: trialActive || paidActive,
-    trialActive: trialActive && !paidActive,
+    allowed: trialActive || paidActive || localPaid,
+    trialActive: trialActive && !paidActive && !localPaid,
     trialEndsAt: subscription.trial_ends_at,
     daysLeft,
-    plan: paidActive ? "pro" : trialActive ? "trial" : "none",
+    plan: paidActive || localPaid ? "pro" : trialActive ? "trial" : "none",
     status: subscription.status,
     stripeCustomerId: subscription.stripe_customer_id,
     stripeSubscriptionId: subscription.stripe_subscription_id,
