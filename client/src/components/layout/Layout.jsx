@@ -36,8 +36,8 @@ export default function Layout() {
   const { user, business, entitlement, logout } = useAuth();
   const navigate = useNavigate();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     navigate("/");
   }
 

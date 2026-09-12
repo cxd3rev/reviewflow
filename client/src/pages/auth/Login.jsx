@@ -17,7 +17,7 @@ export default function Login() {
     setSaving(true);
     try {
       const data = await api("/api/auth/login", { method: "POST", body: JSON.stringify(form) });
-      loginWithPayload(data);
+      await loginWithPayload(data, form);
       navigate(data.business?.onboardingComplete ? "/app" : "/onboarding");
     } catch (err) {
       setError(err.message);
