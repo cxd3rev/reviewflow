@@ -12,7 +12,25 @@ export default function Billing() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (params.get("checkout") === "success") refresh();
+    const sessionId = params.get("session_id");
+    if (params.get("checkout") !== "success") return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        if (sessionId) {
+          await api("/api/billing/complete", {
+            method: "POST",
+            body: JSON.stringify({ sessionId }),
+          });
+        }
+        if (!cancelled) await refresh();
+      } catch {
+        if (!cancelled) await refresh();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [params, refresh]);
 
   async function checkout() {
@@ -68,8 +86,9 @@ export default function Billing() {
 
       {!stripeReady && (
         <p className="alert-warn mb-4">
-          Stripe is not connected yet, so subscribe activates Pro on this computer. To take real {PRICE_EUR} payments, add
-          your Stripe keys to <code className="font-medium">.env</code>.
+          Real card payments need your Stripe secret key in <code className="font-medium">.env</code> as{" "}
+          <code className="font-medium">STRIPE_SECRET_KEY</code> (starts with sk_test_ or sk_live_). Until then,
+          Subscribe only activates Pro on this computer.
         </p>
       )}
 
