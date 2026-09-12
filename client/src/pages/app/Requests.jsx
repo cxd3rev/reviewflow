@@ -5,11 +5,11 @@ import { PageHeader } from "../../components/ui/PageHeader.jsx";
 import { formatDateTime } from "../../utils/format.js";
 
 const filters = [
-  { id: "all", label: "All" },
-  { id: "scheduled", label: "Waiting" },
-  { id: "sent", label: "Sent" },
-  { id: "failed", label: "Failed" },
-  { id: "cancelled", label: "Cancelled" },
+  { id: "all", label: "Alles" },
+  { id: "scheduled", label: "Gepland" },
+  { id: "sent", label: "Verzonden" },
+  { id: "failed", label: "Mislukt" },
+  { id: "cancelled", label: "Geannuleerd" },
 ];
 
 export default function Requests() {
@@ -36,15 +36,15 @@ export default function Requests() {
   return (
     <div>
       <PageHeader
-        title="Review requests"
-        description="Emails waiting to go out, already sent, or cancelled."
+        title="Review verzoeken"
+        description="E-mails die wachten, al verzonden zijn, of geannuleerd."
       />
 
-      <div className="mb-4 flex flex-wrap gap-1 rounded-xl border border-edge bg-white p-1">
+      <div className="mb-4 flex flex-wrap gap-1 rounded-xl border border-white/10 bg-surface p-1">
         {filters.map((filter) => (
           <button
             key={filter.id}
-            className={`rounded-lg px-3 py-1.5 text-sm ${status === filter.id ? "bg-brand-50 font-medium text-brand-700" : "text-muted hover:text-ink"}`}
+            className={`rounded-lg px-3 py-1.5 text-sm ${status === filter.id ? "bg-white/10 font-medium text-white" : "text-muted hover:text-white"}`}
             onClick={() => setStatus(filter.id)}
           >
             {filter.label}
@@ -82,11 +82,11 @@ export default function Requests() {
                 <td className="text-muted">{formatDateTime(request.sentAt)}</td>
                 <td>
                   <StatusBadge status={request.status} />
-                  {request.errorMessage && <div className="mt-1 text-xs text-red-700">{request.errorMessage}</div>}
+                  {request.errorMessage && <div className="mt-1 text-xs text-red-400">{request.errorMessage}</div>}
                 </td>
                 <td className="text-right">
                   {request.status === "scheduled" && (
-                    <button className="text-sm font-medium text-red-700 hover:text-red-800" onClick={() => cancel(request)}>
+                    <button className="text-sm font-medium text-red-400 hover:text-red-300" onClick={() => cancel(request)}>
                       Cancel
                     </button>
                   )}

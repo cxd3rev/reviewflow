@@ -2,7 +2,7 @@ import { PRICE_PER_MONTH } from "../../config/pricing.js";
 
 function Icon({ children }) {
   return (
-    <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+    <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-white">
       {children}
     </span>
   );
@@ -43,10 +43,10 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="bg-white py-24">
+    <section id="features" className="py-24">
       <div className="mx-auto max-w-6xl px-4">
-        <p className="text-center text-sm font-semibold uppercase tracking-wider text-brand-600">What you get</p>
-        <h2 className="display mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold tracking-tight md:text-5xl">
+        <p className="text-center text-sm font-semibold uppercase tracking-wider text-zinc-500">What you get</p>
+        <h2 className="display mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">
           Everything you need. Nothing extra.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-muted">
@@ -54,13 +54,13 @@ export function Features() {
         </p>
         <div className="mt-14 grid gap-5 md:grid-cols-3">
           {features.map((item) => (
-            <div key={item.title} className="rounded-2xl border border-edge bg-white p-6 shadow-sm transition hover:border-brand-100 hover:shadow-md">
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-surface p-6 transition hover:border-white/20">
               <Icon>
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
                   <path strokeLinecap="round" strokeLinejoin="round" d={item.path} />
                 </svg>
               </Icon>
-              <h3 className="text-lg font-semibold">{item.title}</h3>
+              <h3 className="text-lg font-semibold text-white">{item.title}</h3>
               <p className="mt-2 text-sm leading-6 text-muted">{item.text}</p>
             </div>
           ))}

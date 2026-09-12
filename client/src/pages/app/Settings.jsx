@@ -109,7 +109,7 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="Settings" description="Your business, review link, and the email customers receive." />
+      <PageHeader title="Instellingen" description="Je bedrijf, reviewlink en de e-mail die klanten ontvangen." />
       <p className="mb-4 text-sm text-muted">{supabaseStatus}</p>
       {message && <p className="alert-ok mb-4">{message}</p>}
       {error && <p className="alert-error mb-4">{error}</p>}
@@ -218,8 +218,8 @@ export default function Settings() {
         <div className="rounded-xl border border-edge bg-paper p-4">
           <div className="text-xs font-medium uppercase tracking-wide text-muted">Preview</div>
           <div className="mt-2 text-sm font-semibold">{biz.emailSubject}</div>
-          <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-700">{preview}</pre>
-          <div className="mt-3 inline-flex rounded-md bg-ink px-3 py-1.5 text-sm font-medium text-white">Leave a Review</div>
+          <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-zinc-300">{preview}</pre>
+          <div className="mt-3 inline-flex rounded-md bg-white px-3 py-1.5 text-sm font-medium text-black">Leave a Review</div>
         </div>
         <button className="btn-primary">Save</button>
       </form>

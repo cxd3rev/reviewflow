@@ -7,14 +7,12 @@ import { Header } from "./Header.jsx";
 import { Hero } from "./Hero.jsx";
 import { HowItWorks } from "./HowItWorks.jsx";
 import { Pricing } from "./Pricing.jsx";
-import { ProductMock } from "./ProductMock.jsx";
 
 export default function Landing() {
   return (
-    <div className="bg-white text-ink">
+    <div className="bg-paper text-ink">
       <Header />
       <Hero />
-      <ProductMock />
       <HowItWorks />
       <Features />
       <Audience />

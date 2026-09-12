@@ -1,27 +1,24 @@
 import { Link } from "react-router-dom";
-import { Logo } from "../../components/ui/Logo.jsx";
+import { AyvWrldLogo, Logo } from "../../components/ui/Logo.jsx";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 md:px-6">
-        <Logo variant="wordmark" />
-        <nav className="hidden items-center gap-7 text-[15px] text-slate-500 md:flex">
-          <a className="transition hover:text-ink" href="#how">How it works</a>
-          <a className="transition hover:text-ink" href="#features">Features</a>
-          <a className="transition hover:text-ink" href="#pricing">Pricing</a>
-          <a className="transition hover:text-ink" href="#faq">FAQ</a>
-        </nav>
-        <div className="flex items-center gap-4">
-          <Link to="/login" className="hidden text-sm font-semibold text-slate-600 sm:inline hover:text-ink">
-            Log in
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a0a0a]/85 backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 md:px-6">
+        <div className="flex min-w-0 items-center gap-4 md:gap-6">
+          <Logo variant="wordmark" />
+          <span className="hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
+          <AyvWrldLogo className="ayv-on-dark hidden h-16 w-auto sm:block md:h-[4.5rem]" />
+        </div>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link to="/signup" className="btn-primary px-4 sm:px-5">
+            Get started
           </Link>
-          <Link to="/signup" className="btn-primary px-5">
-            Start free trial
+          <Link to="/login" className="btn-ghost border border-white/20 px-4 sm:px-5 text-white">
+            Login
           </Link>
         </div>
       </div>
-      <div className="nav-rainbow" />
     </header>
   );
 }

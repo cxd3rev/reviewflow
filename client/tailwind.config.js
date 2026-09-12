@@ -6,6 +6,7 @@ export default {
     "text-muted",
     "bg-paper",
     "bg-ink",
+    "bg-surface",
     "border-edge",
     "divide-edge",
     "text-brand-500",
@@ -22,18 +23,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#020817",
-        muted: "#65758B",
-        paper: "#F8FAFC",
-        edge: "#E1E7EF",
+        ink: "#F5F5F5",
+        muted: "#8C8C93",
+        paper: "#0A0A0A",
+        surface: "#141416",
+        edge: "#2A2A2E",
         brand: {
-          50: "#E8F0FF",
-          100: "#D4E3FF",
-          400: "#4D8CFF",
-          500: "#0057FA",
-          600: "#0046D6",
-          700: "#003BB3",
-          800: "#002F8F",
+          50: "#1A2744",
+          100: "#24345A",
+          400: "#6BA0FF",
+          500: "#3D7EFF",
+          600: "#5B8CFF",
+          700: "#8AB4FF",
+          800: "#C5D8FF",
         },
       },
       fontFamily: {
@@ -41,7 +43,7 @@ export default {
         display: ["Outfit", "Inter", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(2, 8, 23, 0.04)",
+        card: "0 1px 0 rgba(255, 255, 255, 0.04)",
       },
     },
   },

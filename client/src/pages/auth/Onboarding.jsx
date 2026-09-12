@@ -48,7 +48,7 @@ export default function Onboarding() {
         </div>
         <div className="mb-4 flex gap-1.5">
           {[1, 2, 3, 4, 5].map((n) => (
-            <div key={n} className={`h-1 flex-1 rounded-full ${n <= step ? "bg-brand-400" : "bg-slate-200"}`} />
+            <div key={n} className={`h-1 flex-1 rounded-full ${n <= step ? "bg-white" : "bg-white/10"}`} />
           ))}
         </div>
         <p className="mb-3 text-sm text-muted">Step {step} of 5</p>
@@ -73,7 +73,7 @@ export default function Onboarding() {
                 {TYPES.map((type) => (
                   <button
                     key={type}
-                    className={`rounded-xl border px-3 py-2.5 text-sm transition ${form.type === type ? "border-brand-400 bg-brand-50 font-medium text-ink" : "border-edge bg-white hover:border-slate-300"}`}
+                    className={`rounded-xl border px-3 py-2.5 text-sm transition ${form.type === type ? "border-white/30 bg-white/10 font-medium text-white" : "border-white/10 bg-white/5 hover:border-white/20"}`}
                     onClick={() => setForm({ ...form, type })}
                   >
                     {type}
@@ -110,7 +110,7 @@ export default function Onboarding() {
               <p className="mt-1 text-sm text-muted">Most businesses wait 24 hours after the job is done.</p>
               <div className="mt-5 space-y-2">
                 {DELAYS.map((delay) => (
-                  <label key={delay.value} className="flex items-center gap-3 rounded-xl border border-edge px-3 py-2.5 text-sm has-[:checked]:border-brand-400 has-[:checked]:bg-brand-50">
+                  <label key={delay.value} className="flex items-center gap-3 rounded-xl border border-white/10 px-3 py-2.5 text-sm has-[:checked]:border-white/30 has-[:checked]:bg-white/10">
                     <input
                       type="radio"
                       name="delay"

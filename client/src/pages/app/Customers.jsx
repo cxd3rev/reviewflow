@@ -63,8 +63,8 @@ export default function Customers() {
   return (
     <div>
       <PageHeader
-        title="Customers"
-        description="Add an email so starywrld can ask them for a review after a job."
+        title="Klanten"
+        description="Voeg een e-mail toe zodat starywrld om een review kan vragen."
         action={
           <button className="btn-primary" onClick={openNew}>
             Add customer
@@ -98,7 +98,7 @@ export default function Customers() {
                   {customer.firstName} {customer.lastName}
                 </td>
                 <td>
-                  {customer.email || <span className="text-slate-400">No email — can’t send a request</span>}
+                  {customer.email || <span className="text-zinc-500">Geen e-mail — kan geen verzoek sturen</span>}
                 </td>
                 <td className="text-muted">{customer.phone || "—"}</td>
                 <td className="text-right whitespace-nowrap">
@@ -108,7 +108,7 @@ export default function Customers() {
                   <button className="link mr-3" onClick={() => openEdit(customer)}>
                     Edit
                   </button>
-                  <button className="text-sm font-medium text-red-700 hover:text-red-800" onClick={() => remove(customer)}>
+                  <button className="text-sm font-medium text-red-400 hover:text-red-300" onClick={() => remove(customer)}>
                     Delete
                   </button>
                 </td>

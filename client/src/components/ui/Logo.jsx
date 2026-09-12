@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { APP_NAME } from "../../config/brand.js";
 
-const bust = "20260912e";
+const bust = "20260913a";
 const file = (name) => `${import.meta.env.BASE_URL}${name}?v=${bust}`;
 const LOGO_SRC = file("starywrld-logo.png");
 const ICON_SRC = file("starywrld-icon.png");
@@ -11,7 +11,7 @@ export function BrandMark({ className = "h-9 w-9" }) {
   return <img src={ICON_SRC} alt="" className={`object-contain ${className}`} />;
 }
 
-export function AyvWrldLogo({ className = "h-10 w-auto md:h-12" }) {
+export function AyvWrldLogo({ className = "h-14 w-auto md:h-16" }) {
   return <img src={AYV_LOGO_SRC} alt="ayv wrld" className={`object-contain ${className}`} />;
 }
 

@@ -1,9 +1,9 @@
 export function HowItWorks() {
   return (
-    <section id="how" className="border-t border-edge bg-paper py-24">
+    <section id="how" className="border-t border-white/5 py-24">
       <div className="mx-auto max-w-6xl px-4">
-        <p className="text-center text-sm font-semibold uppercase tracking-wider text-brand-600">How it works</p>
-        <h2 className="display mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold tracking-tight md:text-5xl">
+        <p className="text-center text-sm font-semibold uppercase tracking-wider text-zinc-500">How it works</p>
+        <h2 className="display mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">
           Set up once. Reviews run themselves.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-muted">
@@ -16,11 +16,11 @@ export function HowItWorks() {
             ["3", "Mark the job completed", "starywrld waits your chosen delay, then sends the email."],
             ["4", "They tap Leave a Review", "The button opens your review page. You see sent vs waiting."],
           ].map((item) => (
-            <div key={item[0]} className="rounded-2xl border border-edge bg-white p-6 shadow-sm">
-              <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
+            <div key={item[0]} className="rounded-2xl border border-white/10 bg-surface p-6">
+              <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold text-black">
                 {item[0]}
               </div>
-              <h3 className="text-base font-semibold">{item[1]}</h3>
+              <h3 className="text-base font-semibold text-white">{item[1]}</h3>
               <p className="mt-2 text-sm leading-6 text-muted">{item[2]}</p>
             </div>
           ))}

@@ -37,7 +37,7 @@ function PublicOnly({ children }) {
 }
 
 function Splash() {
-  return <div className="flex min-h-screen items-center justify-center text-sm text-muted">Loading…</div>;
+  return <div className="flex min-h-screen items-center justify-center bg-paper text-sm text-muted">Loading…</div>;
 }
 
 export default function App() {

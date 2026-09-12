@@ -5,19 +5,19 @@ export function Faq() {
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
-    <section id="faq" className="bg-white py-24">
+    <section id="faq" className="py-24">
       <div className="mx-auto max-w-3xl px-4">
-        <h2 className="display text-center text-3xl font-semibold tracking-tight md:text-5xl">Questions, answered</h2>
+        <h2 className="display text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">Questions, answered</h2>
         <p className="mt-4 text-center text-lg text-muted">Short answers so you can get set up quickly.</p>
-        <div className="mt-12 divide-y divide-edge overflow-hidden rounded-2xl border border-edge bg-white">
+        <div className="mt-12 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-surface">
           {faqs.map((item, index) => (
             <div key={item.q} className="px-5">
               <button
-                className="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-semibold md:text-lg"
+                className="flex w-full items-center justify-between gap-4 py-5 text-left text-base font-semibold text-white md:text-lg"
                 onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
               >
                 {item.q}
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-paper text-sm text-muted">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5 text-sm text-muted">
                   {openFaq === index ? "–" : "+"}
                 </span>
               </button>

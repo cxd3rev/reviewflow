@@ -44,7 +44,7 @@ export default function Login() {
       </form>
       <p className="mt-5 text-center text-sm text-muted">
         New here?{" "}
-        <Link className="font-medium text-brand-700" to="/signup">
+        <Link className="font-medium text-white" to="/signup">
           Start free
         </Link>
       </p>

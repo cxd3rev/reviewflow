@@ -8,7 +8,7 @@ export function AuthShell({ title, subtitle, children }) {
           <Logo variant="wordmark" />
         </div>
         <div className="card p-8">
-          <h1 className="display text-2xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="display text-2xl font-semibold tracking-tight text-white">{title}</h1>
           <p className="mt-1.5 mb-6 text-sm leading-6 text-muted">{subtitle}</p>
           {children}
         </div>

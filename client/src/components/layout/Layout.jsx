@@ -4,16 +4,32 @@ import { PRICE_PER_MONTH } from "../../config/pricing.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const workLinks = [
-  { to: "/app", label: "Overview", end: true },
-  { to: "/app/customers", label: "Customers" },
-  { to: "/app/jobs", label: "Jobs" },
-  { to: "/app/requests", label: "Requests" },
+  { to: "/app", label: "Home", end: true, icon: "home" },
+  { to: "/app/customers", label: "Klanten", icon: "users" },
+  { to: "/app/jobs", label: "Jobs", icon: "briefcase" },
+  { to: "/app/requests", label: "Verzoeken", icon: "mail" },
 ];
 
 const accountLinks = [
-  { to: "/app/settings", label: "Settings" },
-  { to: "/app/billing", label: "Billing" },
+  { to: "/app/settings", label: "Instellingen", icon: "cog" },
+  { to: "/app/billing", label: "Facturatie", icon: "card" },
 ];
+
+function Icon({ name }) {
+  const paths = {
+    home: "M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10",
+    users: "M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M11 11a4 4 0 100-8 4 4 0 000 8M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+    briefcase: "M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 7h18v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7z",
+    mail: "M4 6h16v12H4V6zm0 0l8 7 8-7",
+    cog: "M12 15a3 3 0 100-6 3 3 0 000 6zm8.66-3a6.8 6.8 0 00-.14-1.4l2-1.55-2-3.46-2.4.96a7.1 7.1 0 00-2.42-1.4L13.4 2h-2.8L10.3 4.15a7.1 7.1 0 00-2.42 1.4l-2.4-.96-2 3.46 2 1.55A6.8 6.8 0 004.34 12c0 .48.05.94.14 1.4l-2 1.55 2 3.46 2.4-.96a7.1 7.1 0 002.42 1.4L10.6 22h2.8l.3-2.15a7.1 7.1 0 002.42-1.4l2.4.96 2-3.46-2-1.55c.09-.46.14-.92.14-1.4z",
+    card: "M3 7h18v10H3V7zm0 3h18",
+  };
+  return (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+      <path strokeLinecap="round" strokeLinejoin="round" d={paths[name]} />
+    </svg>
+  );
+}
 
 function NavItems({ links }) {
   return links.map((link) => (
@@ -22,14 +38,24 @@ function NavItems({ links }) {
       to={link.to}
       end={link.end}
       className={({ isActive }) =>
-        `block rounded-xl px-3 py-2 text-sm transition ${
-          isActive ? "bg-brand-50 font-semibold text-brand-700" : "text-slate-600 hover:bg-slate-50 hover:text-ink"
+        `flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
+          isActive ? "bg-white/10 font-semibold text-white" : "text-zinc-400 hover:bg-white/5 hover:text-white"
         }`
       }
     >
+      <Icon name={link.icon} />
       {link.label}
     </NavLink>
   ));
+}
+
+function initials(name = "") {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("") || "S";
 }
 
 export default function Layout() {
@@ -42,66 +68,78 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-paper md:flex">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-edge bg-white md:flex">
-        <div className="border-b border-edge px-5 py-5">
-          <Logo to="/app" />
-          <p className="mt-3 truncate text-sm text-muted">{business?.name}</p>
+    <div className="min-h-screen bg-paper text-ink md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-white/10 bg-[#0c0c0e] md:flex">
+        <div className="px-5 py-5">
+          <Logo to="/app" variant="wordmark" />
+          {business?.name ? <p className="mt-3 truncate text-xs text-zinc-500">{business.name}</p> : null}
         </div>
-        <nav className="flex-1 space-y-6 px-3 py-5">
-          <div>
-            <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Work</p>
+        <nav className="flex-1 space-y-6 px-3 py-2">
+          <div className="space-y-1">
             <NavItems links={workLinks} />
           </div>
-          <div>
-            <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Account</p>
+          <div className="space-y-1">
             <NavItems links={accountLinks} />
           </div>
         </nav>
-        <div className="border-t border-edge px-5 py-4">
-          <p className="truncate text-sm font-medium">{user?.name}</p>
-          <button className="mt-1 text-sm text-muted hover:text-ink" onClick={handleLogout}>
+        <div className="border-t border-white/10 px-5 py-4">
+          <p className="truncate text-sm font-medium text-white">{user?.name}</p>
+          <button className="mt-1 text-sm text-zinc-500 hover:text-white" onClick={handleLogout}>
             Log out
           </button>
         </div>
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="border-b border-edge bg-white md:hidden">
-          <div className="flex items-center justify-between px-4 py-3">
-            <Logo to="/app" />
-            <button className="text-sm text-muted" onClick={handleLogout}>
+        <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 md:px-8">
+          <div className="md:hidden">
+            <Logo to="/app" variant="mark" />
+          </div>
+          <label className="relative hidden min-w-0 flex-1 md:block">
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+              </svg>
+            </span>
+            <input className="input max-w-sm pl-9" type="search" placeholder="Zoeken…" aria-label="Zoeken" />
+          </label>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white" title={user?.name}>
+              {initials(user?.name)}
+            </div>
+            <button className="text-sm text-zinc-500 md:hidden" onClick={handleLogout}>
               Log out
             </button>
           </div>
-          <nav className="flex gap-1 overflow-x-auto px-3 pb-3">
-            {[...workLinks, ...accountLinks].map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.end}
-                className={({ isActive }) =>
-                  `whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${
-                    isActive ? "bg-brand-50 font-medium text-ink" : "text-slate-600"
-                  }`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
         </header>
 
+        <nav className="flex gap-1 overflow-x-auto border-b border-white/10 px-3 py-2 md:hidden">
+          {[...workLinks, ...accountLinks].map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
+              className={({ isActive }) =>
+                `whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${
+                  isActive ? "bg-white/10 font-medium text-white" : "text-zinc-400"
+                }`
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+
         {entitlement?.trialActive && (
-          <div className="border-b border-brand-100 bg-brand-50 px-4 py-2.5 text-center text-sm text-ink">
+          <div className="border-b border-white/10 bg-white/5 px-4 py-2.5 text-center text-sm text-zinc-300">
             Trial: {entitlement.daysLeft} day{entitlement.daysLeft === 1 ? "" : "s"} left.{" "}
-            <NavLink to="/app/billing" className="font-medium text-brand-600 underline">
+            <NavLink to="/app/billing" className="font-medium text-white underline">
               Subscribe — {PRICE_PER_MONTH}
             </NavLink>
           </div>
         )}
         {entitlement && !entitlement.allowed && (
-          <div className="border-b border-red-100 bg-red-50 px-4 py-2.5 text-center text-sm text-red-900">
+          <div className="border-b border-red-500/20 bg-red-500/10 px-4 py-2.5 text-center text-sm text-red-200">
             Your trial has ended.{" "}
             <NavLink to="/app/billing" className="font-medium underline">
               Subscribe to keep sending requests
@@ -109,7 +147,7 @@ export default function Layout() {
           </div>
         )}
 
-        <main className="mx-auto max-w-5xl px-4 py-8 md:px-10 md:py-10">
+        <main className="mx-auto max-w-6xl px-4 py-8 md:px-10 md:py-10">
           <Outlet />
         </main>
       </div>

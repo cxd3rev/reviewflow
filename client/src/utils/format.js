@@ -5,6 +5,22 @@ export function formatDate(value) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+export function formatRelative(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  const diff = Date.now() - date.getTime();
+  const mins = Math.round(diff / 60000);
+  if (Math.abs(mins) < 1) return "zojuist";
+  if (mins < 60 && mins >= 0) return `${mins} min geleden`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24 && hours >= 0) return `${hours} uur geleden`;
+  const days = Math.round(hours / 24);
+  if (days === 1) return "gisteren";
+  if (days < 7 && days >= 0) return `${days} dagen geleden`;
+  return formatDate(value);
+}
+
 export function formatDateTime(value) {
   if (!value) return "—";
   const date = new Date(value);
