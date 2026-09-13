@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { PRICE_PER_MONTH } from "../config/pricing.js";
+import { localizedPrice } from "../config/pricing.js";
 import { Logo } from "../components/ui/Logo.jsx";
 import { PageHeader } from "../components/ui/PageHeader.jsx";
 import { StatusBadge } from "../components/ui/StatusBadge.jsx";
@@ -50,7 +50,7 @@ function HeroStage() {
             {t("common.login")}
           </Link>
         </div>
-        <p className="mt-4 text-sm text-zinc-500">{t("hero.trial", { price: PRICE_PER_MONTH })}</p>
+        <p className="mt-4 text-sm text-zinc-500">{t("hero.trial", { price: localizedPrice(t) })}</p>
       </div>
       <div className="demo-hero-mock" data-ai-target="product-mock">
         <ProductMock />
@@ -372,7 +372,7 @@ function CtaStage() {
       <Link to="/signup" className="btn-cta mt-8" data-ai-target="closing-cta">
         {t("common.getStarted")}
       </Link>
-      <p className="mt-4 text-sm text-zinc-500">{t("cta.after", { price: PRICE_PER_MONTH })}</p>
+        <p className="mt-4 text-sm text-zinc-500">{t("cta.after", { price: localizedPrice(t) })}</p>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { AyvWrldLogo, Logo } from "../../components/ui/Logo.jsx";
 import { LanguageSwitcher } from "../../components/ui/LanguageSwitcher.jsx";
 import { APP_NAME, COMPANY_NAME } from "../../config/brand.js";
-import { PRICE_PER_MONTH } from "../../config/pricing.js";
+import { localizedPrice } from "../../config/pricing.js";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export function ClosingCta() {
@@ -15,7 +15,7 @@ export function ClosingCta() {
         <Link to="/signup" className="btn-cta mt-8" data-ai-target="closing-cta">
           {t("common.getStarted")}
         </Link>
-        <p className="mt-4 text-sm text-zinc-500">{t("cta.after", { price: PRICE_PER_MONTH })}</p>
+        <p className="mt-4 text-sm text-zinc-500">{t("cta.after", { price: localizedPrice(t) })}</p>
       </div>
     </section>
   );

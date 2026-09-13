@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { PRICE_PER_MONTH } from "../../config/pricing.js";
+import { localizedPrice } from "../../config/pricing.js";
 import { ProductMock } from "./ProductMock.jsx";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
@@ -23,7 +23,7 @@ export function Hero() {
               {t("common.login")}
             </Link>
           </div>
-          <p className="mt-4 text-sm text-zinc-500">{t("hero.trial", { price: PRICE_PER_MONTH })}</p>
+          <p className="mt-4 text-sm text-zinc-500">{t("hero.trial", { price: localizedPrice(t) })}</p>
         </div>
         <ProductMock />
       </div>

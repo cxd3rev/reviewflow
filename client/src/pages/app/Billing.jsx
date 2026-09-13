@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { api } from "../../lib/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { PageHeader } from "../../components/ui/PageHeader.jsx";
-import { PRICE_EUR, PRICE_PER_MONTH } from "../../config/pricing.js";
+import { PRICE_EUR, localizedPrice } from "../../config/pricing.js";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export default function Billing() {
@@ -117,7 +117,7 @@ export default function Billing() {
         <div className="mt-5 flex flex-col gap-2">
           {entitlement?.plan !== "pro" && (
             <button className="btn-primary" onClick={checkout} disabled={busy}>
-              {stripeReady ? t("billing.subscribe", { price: PRICE_PER_MONTH }) : t("billing.activate")}
+              {stripeReady ? t("billing.subscribe", { price: localizedPrice(t) }) : t("billing.activate")}
             </button>
           )}
           {entitlement?.stripeCustomerId && stripeReady && (

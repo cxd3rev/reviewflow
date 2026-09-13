@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PRICE_PER_MONTH } from "../../config/pricing.js";
+import { localizedPrice } from "../../config/pricing.js";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export function Faq() {
@@ -7,7 +7,7 @@ export function Faq() {
   const [openFaq, setOpenFaq] = useState(0);
   const faqs = [1, 2, 3, 4, 5, 6].map((n) => ({
     q: t(`faq.q${n}`),
-    a: n === 6 ? t("faq.a6", { price: PRICE_PER_MONTH }) : t(`faq.a${n}`),
+    a: n === 6 ? t("faq.a6", { price: localizedPrice(t) }) : t(`faq.a${n}`),
   }));
 
   return (

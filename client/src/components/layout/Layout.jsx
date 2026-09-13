@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Logo } from "../ui/Logo.jsx";
 import { LanguageSwitcher } from "../ui/LanguageSwitcher.jsx";
-import { PRICE_PER_MONTH } from "../../config/pricing.js";
+import { localizedPrice } from "../../config/pricing.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
@@ -140,7 +140,7 @@ export default function Layout() {
           <div className="border-b border-white/10 bg-white/5 px-4 py-2.5 text-center text-sm text-zinc-300">
             {entitlement.daysLeft === 1 ? t("trial.leftOne") : t("trial.left", { n: entitlement.daysLeft })}{" "}
             <NavLink to="/app/billing" className="font-medium text-white underline">
-              {t("trial.subscribe", { price: PRICE_PER_MONTH })}
+              {t("trial.subscribe", { price: localizedPrice(t) })}
             </NavLink>
           </div>
         )}

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../lib/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { AuthShell } from "./AuthShell.jsx";
-import { PRICE_PER_MONTH } from "../../config/pricing.js";
+import { localizedPrice } from "../../config/pricing.js";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 export default function Signup() {
@@ -30,7 +30,7 @@ export default function Signup() {
   }
 
   return (
-    <AuthShell title={t("auth.signupTitle")} subtitle={t("auth.signupSub", { price: PRICE_PER_MONTH })}>
+    <AuthShell title={t("auth.signupTitle")} subtitle={t("auth.signupSub", { price: localizedPrice(t) })}>
       <form onSubmit={onSubmit} className="space-y-4">
         {error && <p className="alert-error">{error}</p>}
         <div>

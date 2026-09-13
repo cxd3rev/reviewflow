@@ -19,6 +19,10 @@ function readStoredLang() {
     if (fromQuery && strings[fromQuery]) return fromQuery;
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && strings[stored]) return stored;
+    const nav = String(navigator.language || navigator.userLanguage || "")
+      .slice(0, 2)
+      .toLowerCase();
+    if (nav && strings[nav]) return nav;
   } catch {
     /* ignore */
   }

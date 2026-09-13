@@ -1,4 +1,4 @@
-import { PRICE_PER_MONTH } from "../../config/pricing.js";
+import { localizedPrice } from "../../config/pricing.js";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 
 function Icon({ children }) {
@@ -22,7 +22,7 @@ export function Features() {
   const { t } = useI18n();
   const items = [1, 2, 3, 4, 5, 6].map((n, i) => ({
     title: t(`features.f${n}t`),
-    text: n === 6 ? t("features.f6d", { price: PRICE_PER_MONTH }) : t(`features.f${n}d`),
+    text: n === 6 ? t("features.f6d", { price: localizedPrice(t) }) : t(`features.f${n}d`),
     path: PATHS[i],
   }));
 
