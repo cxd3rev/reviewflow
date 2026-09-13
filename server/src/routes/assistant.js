@@ -3,14 +3,9 @@ import { buildSystemPrompt, matchAssistantReply, stripHighlightHint } from "../.
 import { trim } from "../utils/validation.js";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
-const OPENAI_TTS_URL = "https://api.openai.com/v1/audio/speech";
 
 function assistantKey() {
   return trim(process.env.OPENAI_API_KEY || process.env.ASSISTANT_API_KEY);
-}
-
-function ttsKey() {
-  return trim(process.env.TTS_API_KEY || process.env.OPENAI_API_KEY || process.env.ASSISTANT_API_KEY);
 }
 
 async function completeWithOpenAI({ message, locale, history }) {
@@ -94,36 +89,9 @@ export function assistantRoutes() {
     }
   });
 
-  // Placeholder: returns audio/mpeg when a key exists, otherwise { fallback: true }.
-  router.post("/tts", async (req, res) => {
-    const text = trim(req.body?.text).slice(0, 400);
-    const key = ttsKey();
-    if (!text) return res.status(400).json({ error: "Text is required." });
-    if (!key) return res.json({ fallback: true, audioUrl: null });
-
-    try {
-      const response = await fetch(OPENAI_TTS_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: process.env.TTS_MODEL || "tts-1",
-          voice: process.env.TTS_VOICE || "nova",
-          input: text,
-        }),
-      });
-      if (!response.ok) {
-        return res.json({ fallback: true, audioUrl: null });
-      }
-      const buffer = Buffer.from(await response.arrayBuffer());
-      res.setHeader("Content-Type", "audio/mpeg");
-      return res.send(buffer);
-    } catch (err) {
-      console.error("[assistant:tts]", err.message);
-      return res.json({ fallback: true, audioUrl: null });
-    }
+  // Voice is disabled — the orb uses text balloons only.
+  router.post("/tts", (_req, res) => {
+    return res.json({ fallback: true, audioUrl: null });
   });
 
   return router;
