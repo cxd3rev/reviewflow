@@ -12,6 +12,17 @@ import "./demo.css";
 
 const CANVAS = { w: 1280, h: 720 };
 
+function requestedSceneId() {
+  if (typeof window === "undefined") return "";
+  return new URLSearchParams(window.location.search).get("scene") || "";
+}
+
+function scenesFromQuery() {
+  const id = requestedSceneId();
+  const idx = scenes.findIndex((item) => item.id === id);
+  return idx >= 0 ? scenes.slice(idx) : scenes;
+}
+
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
@@ -19,6 +30,7 @@ function prefersReducedMotion() {
 export function DemoPlayer({ autoRecord = false }) {
   const { t } = useI18n();
   const queryRecord = autoRecord || recordingRequested();
+  const queryScene = requestedSceneId();
   const [recording, setRecording] = useState(queryRecord);
   const [started, setStarted] = useState(queryRecord);
   const [done, setDone] = useState(false);
@@ -92,7 +104,7 @@ export function DemoPlayer({ autoRecord = false }) {
       if (now - begun < total) rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
-    await runner.run(scenes);
+    await runner.run(scenesFromQuery());
   }, [recording, resetUi, stop]);
 
   startRef.current = start;
@@ -109,10 +121,10 @@ export function DemoPlayer({ autoRecord = false }) {
   }, [started]);
 
   useEffect(() => {
-    if (!queryRecord) return undefined;
+    if (!queryRecord && !queryScene) return undefined;
     const id = window.setTimeout(() => startRef.current?.(), 450);
     return () => window.clearTimeout(id);
-  }, [queryRecord]);
+  }, [queryRecord, queryScene]);
 
   useEffect(
     () => () => {
@@ -123,6 +135,7 @@ export function DemoPlayer({ autoRecord = false }) {
       orb.setRecording(false);
       orb.setVisible(true);
       orb.setOffset({ x: 0, y: 0 });
+      orb.setDock?.("br");
     },
     [stop]
   );

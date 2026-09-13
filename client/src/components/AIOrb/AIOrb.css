@@ -8,6 +8,7 @@
   --ai-orb-glow: rgba(61, 126, 255, 0.42);
   --ai-orb-z: 45;
   --ai-orb-pad: max(1.15rem, env(safe-area-inset-right));
+  --ai-orb-pad-l: max(1.15rem, env(safe-area-inset-left));
   --ai-orb-pad-b: max(1.15rem, env(safe-area-inset-bottom));
   position: fixed;
   right: var(--ai-orb-pad);
@@ -26,6 +27,48 @@
 
 .ai-orb-root.is-scripted {
   transition: transform 0.7s ease;
+}
+
+.ai-orb-root.is-scripted[data-dock="bl"],
+.ai-orb-root.is-scripted[data-dock="ml"],
+.ai-orb-root.is-scripted[data-dock="tl"] {
+  right: auto;
+  left: var(--ai-orb-pad-l);
+  align-items: flex-start;
+}
+
+.ai-orb-root.is-scripted .ai-orb-stage {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ai-orb-root.is-scripted[data-dock="bl"] .ai-orb-stage,
+.ai-orb-root.is-scripted[data-dock="ml"] .ai-orb-stage,
+.ai-orb-root.is-scripted[data-dock="tl"] .ai-orb-stage {
+  align-items: flex-start;
+}
+
+.ai-orb-root.is-scripted .ai-orb-bubble {
+  position: absolute;
+  bottom: calc(100% + 0.65rem);
+  right: 0;
+  left: auto;
+  width: min(20rem, calc(100vw - 5.5rem));
+  max-width: min(20rem, calc(100vw - 5.5rem));
+  border-radius: 14px 14px 4px 14px;
+}
+
+.ai-orb-root.is-scripted[data-dock="bl"] .ai-orb-bubble,
+.ai-orb-root.is-scripted[data-dock="ml"] .ai-orb-bubble,
+.ai-orb-root.is-scripted[data-dock="tl"] .ai-orb-bubble {
+  right: auto;
+  left: 0;
+  border-radius: 14px 14px 14px 4px;
+}
+
+.ai-orb-root.is-scripted .ai-orb-panel {
+  width: min(19.5rem, calc(100vw - 2rem));
+  max-height: min(20rem, 46vh);
 }
 
 .ai-orb-root.is-scripted .ai-orb-tip,
@@ -401,6 +444,23 @@
   .ai-orb-panel {
     width: min(22rem, calc(100vw - 1.25rem));
     max-height: min(26rem, calc(100dvh - 6.5rem));
+  }
+
+  .ai-orb-root.is-scripted {
+    --ai-orb-size: var(--ai-orb-size-mobile);
+  }
+
+  .ai-orb-root.is-scripted .ai-orb-bubble {
+    width: min(13rem, calc(100vw - 4.75rem));
+    max-width: min(13rem, calc(100vw - 4.75rem));
+    font-size: 0.75rem;
+    line-height: 1.35;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .ai-orb-root.is-scripted .ai-orb-panel {
+    width: min(16.5rem, calc(100vw - 1.25rem));
+    max-height: min(16rem, 42vh);
   }
 }
 

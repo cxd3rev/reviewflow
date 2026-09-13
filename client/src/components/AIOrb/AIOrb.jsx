@@ -41,6 +41,7 @@ export function AIOrb() {
   const [bubble, setBubble] = useState("");
   const [level, setLevel] = useState(0);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [dock, setDock] = useState("br");
   const [offline, setOffline] = useState(false);
   const [demoActive, setDemoActive] = useState(false);
   const [scripted, setScripted] = useState(false);
@@ -148,7 +149,11 @@ export function AIOrb() {
 
     const bridge = {
       setVisible,
-      setOffset,
+      setOffset: (value) => {
+        setOffset({ x: value?.x || 0, y: value?.y || 0 });
+        if (value?.dock) setDock(value.dock);
+      },
+      setDock: (value) => setDock(value || "br"),
       setOrbState,
       setChatOpen,
       setBubble,
@@ -201,6 +206,8 @@ export function AIOrb() {
       setVisible(true);
       setScripted(false);
       setRecording(false);
+      setDock("br");
+      setOffset({ x: 0, y: 0 });
     }
   }, [onDemo, scripted]);
 
@@ -284,7 +291,12 @@ export function AIOrb() {
   };
 
   return (
-    <div className={rootClass} style={rootStyle} aria-hidden={hidden || undefined}>
+    <div
+      className={rootClass}
+      style={rootStyle}
+      data-dock={scripted ? dock : "br"}
+      aria-hidden={hidden || undefined}
+    >
       {chatOpen ? (
         <AIChat
           t={t}

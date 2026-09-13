@@ -5,6 +5,7 @@ import { playNarration, cancelBrowserSpeech } from "./speech.js";
 export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, onDone, onAction }) {
   let cancelled = false;
   const timers = new Set();
+  let lastPosition = "br";
 
   function wait(ms) {
     return new Promise((resolve) => {
@@ -17,7 +18,10 @@ export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, o
   }
 
   function applyPosition(position) {
-    orb.setOffset(resolveOrbOffset(position, stageEl?.()));
+    lastPosition = position || "br";
+    const next = resolveOrbOffset(lastPosition, stageEl?.());
+    orb.setOffset(next);
+    orb.setDock?.(next.dock || "br");
   }
 
   async function runAction(action) {
@@ -43,13 +47,17 @@ export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, o
     orb.setMessages?.([]);
 
     const demoStarted = performance.now();
+    const onResize = () => applyPosition(lastPosition);
+    window.addEventListener("resize", onResize);
 
-    for (const scene of scenes) {
+    try {
+      for (const scene of scenes) {
       if (cancelled) break;
       const sceneStarted = performance.now();
       onScene?.(scene);
       applyPosition(scene.orbPosition);
       await wait(80);
+      applyPosition(scene.orbPosition);
 
       if (scene.action) await runAction(scene.action);
       if (cancelled) break;
@@ -60,7 +68,10 @@ export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, o
           timers.delete(id);
           if (cancelled) return;
           if (beat.ui) onBeat?.(beat.ui);
-          if (beat.chat === "open") orb.setChatOpen(true);
+          if (beat.chat === "open") {
+            orb.setBubble("");
+            orb.setChatOpen(true);
+          }
           if (beat.chat === "close") {
             orb.setChatOpen(false);
             orb.setBubble("");
@@ -115,6 +126,9 @@ export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, o
       const used = performance.now() - sceneStarted;
       if (used < scene.duration) await wait(scene.duration - used);
       onProgress?.(Math.min(1, (performance.now() - demoStarted) / scenes.reduce((sum, item) => sum + item.duration, 0)));
+      }
+    } finally {
+      window.removeEventListener("resize", onResize);
     }
 
     cancelBrowserSpeech();
@@ -135,6 +149,7 @@ export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, o
     orb.setBubble("");
     orb.setChatOpen(false);
     orb.setOffset({ x: 0, y: 0 });
+    orb.setDock?.("br");
     orb.setOrbState("idle");
     orb.onEnd?.();
   }
