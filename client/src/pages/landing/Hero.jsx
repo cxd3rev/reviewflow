@@ -16,10 +16,10 @@ export function Hero() {
           </h1>
           <p className="mt-6 max-w-md text-lg leading-8 text-zinc-400 md:text-xl">{t("hero.subtitle")}</p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Link to="/signup" className="btn-cta">
+            <Link to="/signup" className="btn-cta" data-ai-target="hero-get-started">
               {t("common.getStarted")}
             </Link>
-            <Link to="/login" className="btn-secondary px-8 py-3.5 text-base">
+            <Link to="/login" className="btn-secondary px-8 py-3.5 text-base" data-ai-target="hero-login">
               {t("common.login")}
             </Link>
           </div>

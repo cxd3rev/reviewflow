@@ -25,7 +25,7 @@ export function ProductMock() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative" data-ai-target="product-mock">
       <div className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-white/[0.03] blur-2xl" />
       <div className="relative overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#111113] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.8)]">
         <div className="flex min-h-[420px]">
@@ -49,7 +49,7 @@ export function ProductMock() {
                 <div className="h-8 w-8 rounded-full bg-white/15" />
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2" data-ai-target="mock-stats">
               {stats.map((stat) => (
                 <div key={stat[0]} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
                   <div className="text-[11px] text-zinc-500">{stat[0]}</div>
@@ -60,7 +60,7 @@ export function ProductMock() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+            <div className="mt-4 overflow-hidden rounded-xl border border-white/10" data-ai-target="mock-table">
               <div className="px-3 py-2.5 text-xs font-semibold text-white">{t("mock.table")}</div>
               <table className="w-full text-left text-xs">
                 <thead className="text-[10px] uppercase tracking-wide text-zinc-500">

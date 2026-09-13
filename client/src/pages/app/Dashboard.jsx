@@ -47,12 +47,12 @@ export default function Dashboard() {
           <p className="mt-1 text-sm text-zinc-400">{t("dash.overview")}</p>
           <p className="mt-1 text-sm text-zinc-500">{t("dash.today")}</p>
         </div>
-        <Link to="/app/jobs" className="btn-primary">
+        <Link to="/app/jobs" className="btn-primary" data-ai-target="new-job">
           {t("dash.newJob")}
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-ai-target="dashboard-stats">
         {stats.map((stat) => (
           <div key={stat.label} className="card p-5">
             <div className="flex items-center justify-between gap-2">

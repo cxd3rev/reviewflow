@@ -83,7 +83,7 @@ export default function Jobs() {
         title={t("jobs.title")}
         description={t("jobs.desc")}
         action={
-          <button className="btn-primary" onClick={openNew} disabled={customers.length === 0}>
+          <button className="btn-primary" onClick={openNew} disabled={customers.length === 0} data-ai-target="add-job">
             {t("jobs.add")}
           </button>
         }

@@ -11,10 +11,10 @@ export function Header() {
         <Logo variant="wordmark" />
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
-          <Link to="/signup" className="btn-primary px-4 sm:px-5">
+          <Link to="/signup" className="btn-primary px-4 sm:px-5" data-ai-target="get-started">
             {t("header.getStarted")}
           </Link>
-          <Link to="/login" className="btn-ghost border border-white/20 px-4 sm:px-5 text-white">
+          <Link to="/login" className="btn-ghost border border-white/20 px-4 sm:px-5 text-white" data-ai-target="login">
             {t("header.login")}
           </Link>
         </div>

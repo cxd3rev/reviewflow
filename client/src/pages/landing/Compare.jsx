@@ -8,7 +8,7 @@ export function Compare() {
         <h2 className="display text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">{t("compare.title")}</h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-muted">{t("compare.subtitle")}</p>
         <div className="mt-14 grid gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-[#0f0f11] p-8">
+          <div className="rounded-2xl border border-white/10 bg-[#0f0f11] p-8" data-ai-target="compare-without">
             <h3 className="text-xl font-semibold text-zinc-300">{t("compare.without")}</h3>
             <p className="mt-1 text-sm text-muted">{t("compare.withoutSub")}</p>
             <ul className="mt-6 space-y-3 text-zinc-400">
@@ -20,7 +20,7 @@ export function Compare() {
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-white/15 bg-surface p-8">
+          <div className="rounded-2xl border border-white/15 bg-surface p-8" data-ai-target="compare-with">
             <h3 className="text-xl font-semibold text-white">{t("compare.with")}</h3>
             <p className="mt-1 text-sm text-zinc-400">{t("compare.withSub")}</p>
             <ul className="mt-6 space-y-3 text-zinc-300">

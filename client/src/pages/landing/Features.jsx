@@ -27,7 +27,7 @@ export function Features() {
   }));
 
   return (
-    <section id="features" className="py-24">
+    <section id="features" className="py-24" data-ai-target="features">
       <div className="mx-auto max-w-6xl px-4">
         <p className="text-center text-sm font-semibold uppercase tracking-wider text-zinc-500">{t("features.eyebrow")}</p>
         <h2 className="display mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">

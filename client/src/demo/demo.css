@@ -1,0 +1,207 @@
+.demo-page {
+  min-height: 100dvh;
+  background: #0a0a0a;
+  color: #f5f5f5;
+  overflow-x: hidden;
+}
+
+.demo-page.is-recording {
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-start {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem 4rem;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(61, 126, 255, 0.14), transparent 46%),
+    #0a0a0a;
+}
+
+.demo-start-card {
+  width: min(36rem, 100%);
+  text-align: center;
+}
+
+.demo-stage-wrap {
+  position: relative;
+  width: min(100%, calc(100dvh * 16 / 9));
+  max-height: 100dvh;
+  margin: 0 auto;
+}
+
+.demo-page.is-recording .demo-stage-wrap {
+  width: min(100vw, calc(100dvh * 16 / 9));
+  height: min(100dvh, calc(100vw * 9 / 16));
+  max-height: none;
+}
+
+.demo-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+}
+
+.demo-page.is-recording .demo-stage {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.demo-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1280px;
+  height: 720px;
+  transform-origin: center center;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+.demo-canvas.is-fade {
+  animation: demo-fade 0.45s ease;
+}
+
+.demo-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  cursor: none;
+}
+
+.demo-chrome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.demo-progress {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.demo-progress > span {
+  display: block;
+  height: 100%;
+  background: #6ba0ff;
+  transition: width 0.2s linear;
+}
+
+.demo-app {
+  position: relative;
+  display: flex;
+  height: 100%;
+  background: #0a0a0a;
+}
+
+.demo-app-side {
+  width: 168px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0c0c0e;
+  padding: 1.1rem 0.8rem;
+}
+
+.demo-app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 1.4rem 1.6rem;
+  overflow: hidden;
+}
+
+.demo-hero-mock {
+  transform: scale(0.86);
+  transform-origin: top right;
+}
+
+.landing-demo-player {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #111113;
+  aspect-ratio: 16 / 9;
+}
+
+.landing-demo-player video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #0a0a0a;
+}
+
+.landing-demo-poster {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(61, 126, 255, 0.16), transparent 50%),
+    #111113;
+}
+
+.landing-demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0c0c0e;
+}
+
+.landing-demo-range {
+  flex: 1;
+  min-width: 6rem;
+  accent-color: #6ba0ff;
+}
+
+@media (max-width: 720px) {
+  .demo-stage {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .demo-chrome {
+    padding: 0.65rem 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-canvas.is-fade,
+  .demo-progress > span {
+    animation: none;
+    transition: none;
+  }
+}
+
+@keyframes demo-fade {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}

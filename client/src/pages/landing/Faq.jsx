@@ -11,7 +11,7 @@ export function Faq() {
   }));
 
   return (
-    <section id="faq" className="py-24">
+    <section id="faq" className="py-24" data-ai-target="faq">
       <div className="mx-auto max-w-3xl px-4">
         <h2 className="display text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">{t("faq.title")}</h2>
         <p className="mt-4 text-center text-lg text-muted">{t("faq.subtitle")}</p>

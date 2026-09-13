@@ -12,7 +12,7 @@ export function ClosingCta() {
       <div className="mx-auto max-w-3xl px-4">
         <h2 className="display text-3xl font-semibold tracking-tight text-white md:text-5xl">{t("cta.title")}</h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-zinc-400">{t("cta.subtitle")}</p>
-        <Link to="/signup" className="btn-cta mt-8">
+        <Link to="/signup" className="btn-cta mt-8" data-ai-target="closing-cta">
           {t("common.getStarted")}
         </Link>
         <p className="mt-4 text-sm text-zinc-500">{t("cta.after", { price: PRICE_PER_MONTH })}</p>
@@ -37,6 +37,7 @@ export function Footer() {
         <div>
           <h3 className="mb-3 font-semibold text-white">{t("footer.product")}</h3>
           <ul className="space-y-2">
+            <li><a className="hover:text-white" href="#demo">{t("landingDemo.eyebrow")}</a></li>
             <li><a className="hover:text-white" href="#how">{t("footer.how")}</a></li>
             <li><a className="hover:text-white" href="#features">{t("footer.features")}</a></li>
             <li><a className="hover:text-white" href="#pricing">{t("footer.pricing")}</a></li>

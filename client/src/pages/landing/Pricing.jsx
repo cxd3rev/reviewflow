@@ -5,7 +5,7 @@ import { useI18n } from "../../i18n/LanguageContext.jsx";
 export function Pricing() {
   const { t } = useI18n();
   return (
-    <section id="pricing" className="border-t border-white/5 py-24">
+    <section id="pricing" className="border-t border-white/5 py-24" data-ai-target="pricing">
       <div className="mx-auto max-w-6xl px-4 text-center">
         <p className="text-sm font-semibold uppercase tracking-wider text-zinc-500">{t("pricing.eyebrow")}</p>
         <h2 className="display mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">{t("pricing.title")}</h2>
@@ -28,7 +28,7 @@ export function Pricing() {
               </li>
             ))}
           </ul>
-          <Link to="/signup" className="btn-cta mt-8 w-full">
+          <Link to="/signup" className="btn-cta mt-8 w-full" data-ai-target="pricing-cta">
             {t("pricing.cta")}
           </Link>
         </div>

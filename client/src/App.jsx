@@ -11,6 +11,8 @@ import Login from "./pages/auth/Login.jsx";
 import Onboarding from "./pages/auth/Onboarding.jsx";
 import Signup from "./pages/auth/Signup.jsx";
 import Landing from "./pages/landing/Landing.jsx";
+import DemoPage from "./demo/DemoPlayer.jsx";
+import { AIOrb } from "./components/AIOrb/AIOrb.jsx";
 
 function Protected({ children }) {
   const { user, business, loading } = useAuth();
@@ -42,41 +44,45 @@ function Splash() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route
-        path="/login"
-        element={
-          <PublicOnly>
-            <Login />
-          </PublicOnly>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicOnly>
-            <Signup />
-          </PublicOnly>
-        }
-      />
-      <Route path="/onboarding" element={<OnboardingGate />} />
-      <Route
-        path="/app"
-        element={
-          <Protected>
-            <Layout />
-          </Protected>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="customers" element={<Customers />} />
-        <Route path="jobs" element={<Jobs />} />
-        <Route path="requests" element={<Requests />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="billing" element={<Billing />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/demo" element={<DemoPage />} />
+        <Route
+          path="/login"
+          element={
+            <PublicOnly>
+              <Login />
+            </PublicOnly>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicOnly>
+              <Signup />
+            </PublicOnly>
+          }
+        />
+        <Route path="/onboarding" element={<OnboardingGate />} />
+        <Route
+          path="/app"
+          element={
+            <Protected>
+              <Layout />
+            </Protected>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="jobs" element={<Jobs />} />
+          <Route path="requests" element={<Requests />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="billing" element={<Billing />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <AIOrb />
+    </>
   );
 }

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0a0a0a"/>
+  <ellipse cx="280" cy="80" rx="360" ry="220" fill="#3d7eff" fill-opacity="0.14"/>
+  <text x="640" y="340" text-anchor="middle" fill="#ffffff" font-family="Outfit, Inter, sans-serif" font-size="52" font-weight="600">starywrld</text>
+  <text x="640" y="392" text-anchor="middle" fill="#8c8c93" font-family="Inter, sans-serif" font-size="22">Reviews that write themselves.</text>
+</svg>

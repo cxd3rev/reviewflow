@@ -68,7 +68,7 @@ export default function Customers() {
         title={t("customers.title")}
         description={t("customers.desc")}
         action={
-          <button className="btn-primary" onClick={openNew}>
+          <button className="btn-primary" onClick={openNew} data-ai-target="add-customer">
             {t("customers.add")}
           </button>
         }
