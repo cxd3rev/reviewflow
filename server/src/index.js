@@ -12,6 +12,7 @@ import { customerRoutes } from "./routes/customers.js";
 import { dashboardRoutes } from "./routes/dashboard.js";
 import { jobRoutes } from "./routes/jobs.js";
 import { requestRoutes } from "./routes/requests.js";
+import { assistantRoutes } from "./routes/assistant.js";
 import { startScheduler } from "./services/scheduler.js";
 import { attachSupabase, pingSupabaseAuth } from "./services/supabase.js";
 import { createStore } from "./store/index.js";
@@ -69,6 +70,7 @@ app.get("/api/health", async (_req, res) => {
   });
 });
 
+app.use("/api/assistant", assistantRoutes());
 app.use("/api/auth", authRoutes(db));
 app.use("/api/business", authRequired(db), businessRoutes(db));
 app.use("/api/customers", authRequired(db), requireAccess(db), customerRoutes(db));
