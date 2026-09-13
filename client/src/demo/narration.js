@@ -1,6 +1,6 @@
 /**
  * All product-demo narration in one place.
- * Pre-recorded files live in /demo/audio/{id}.mp3 (optional).
+ * Shown as speech bubbles on the orb — no voice, TTS, or audio files.
  * Copy matches existing product facts only — do not invent features here.
  */
 export const narration = {

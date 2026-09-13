@@ -682,7 +682,7 @@ export const strings = {
       title: "Voir starywrld demander l’avis",
       subtitle: "Une visite de quatre minutes et demie. Demandes d’avis automatiques après le chantier.",
       start: "Lancer la démo",
-      hint: "Elle se lance toute seule. Mêmes scènes, voix et surbrillances à chaque fois.",
+      hint: "Elle se lance toute seule. Mêmes scènes, bulles et surbrillances à chaque fois.",
       replay: "Rejouer",
       recording: "Mode enregistrement",
       recordThis: "Enregistrer cette démo",

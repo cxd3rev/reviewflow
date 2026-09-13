@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useI18n } from "../../i18n/LanguageContext.jsx";
 import { assistantContext, stripHighlightHint } from "./assistantContext.js";
@@ -7,8 +7,6 @@ import { createDemoController, demoRequested } from "./DemoController.js";
 import { demoScript } from "./demoScript.js";
 import { clearHighlight, highlightElement } from "./highlight.js";
 import { setOrbBridge } from "./orbBridge.js";
-import { createSpeechPlayer } from "./tts/audio.js";
-import { synthesizeSpeech } from "./tts/ttsClient.js";
 import AIChat from "./AIChat.jsx";
 import OrbVisualizer from "./OrbVisualizer.jsx";
 import "./AIOrb.css";
@@ -25,19 +23,11 @@ function isDemoPath(pathname) {
   return pathname === "/demo" || pathname.endsWith("/demo");
 }
 
-function speakBrowser(text) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return false;
-  try {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    utterance.lang = document.documentElement.lang || "en";
-    window.speechSynthesis.speak(utterance);
-    return true;
-  } catch {
-    return false;
-  }
+function readingTimeMs(text, duration) {
+  if (Number.isFinite(duration) && duration > 0) return duration;
+  const clean = String(text || "").trim();
+  if (!clean) return 0;
+  return Math.min(8000, Math.max(1200, 900 + clean.length * 28));
 }
 
 export function AIOrb() {
@@ -57,81 +47,77 @@ export function AIOrb() {
   const [recording, setRecording] = useState(false);
   const [visible, setVisible] = useState(!onDemo);
   const reduced = useRef(prefersReducedMotion());
-  const playerRef = useRef(null);
   const demoRef = useRef(null);
   const chatOpenRef = useRef(false);
   const scriptedRef = useRef(false);
   const sendingRef = useRef(false);
+  const speakGenRef = useRef(0);
+  const speakTimerRef = useRef(0);
+  const speakResolveRef = useRef(null);
 
   chatOpenRef.current = chatOpen;
   scriptedRef.current = scripted;
 
-  const player = useMemo(() => {
-    const instance = createSpeechPlayer({
-      onLevel: (value) => setLevel(value),
-      onEnd: () => {
-        setLevel(0);
-        setOrbState((prev) => (prev === "speaking" ? (chatOpenRef.current ? "open" : "idle") : prev));
-      },
+  const waitMs = useCallback((ms) => {
+    return new Promise((resolve) => {
+      if (speakTimerRef.current) window.clearTimeout(speakTimerRef.current);
+      speakResolveRef.current?.();
+      speakResolveRef.current = resolve;
+      speakTimerRef.current = window.setTimeout(() => {
+        speakTimerRef.current = 0;
+        speakResolveRef.current = null;
+        resolve();
+      }, Math.max(0, ms || 0));
     });
-    playerRef.current = instance;
-    return instance;
   }, []);
 
   const stopSpeech = useCallback(() => {
-    player.stop();
-    try {
-      window.speechSynthesis?.cancel();
-    } catch {
-      /* ignore */
+    speakGenRef.current += 1;
+    if (speakTimerRef.current) {
+      window.clearTimeout(speakTimerRef.current);
+      speakTimerRef.current = 0;
     }
+    speakResolveRef.current?.();
+    speakResolveRef.current = null;
     setLevel(0);
-  }, [player]);
+  }, []);
 
   const speak = useCallback(
-    async (text, duration, options = {}) => {
+    async (text, duration) => {
       const clean = String(text || "").trim();
       if (!clean) return "empty";
+      const gen = (speakGenRef.current += 1);
       setBubble(clean);
-      if (reduced.current) {
-        setOrbState("speaking");
-        await new Promise((resolve) => setTimeout(resolve, Math.min(duration || 1800, 1600)));
-        setOrbState(chatOpenRef.current ? "open" : "idle");
-        return "reduced";
-      }
       setOrbState("speaking");
-      const fallbackMs = duration || Math.min(4000, 900 + clean.length * 28);
-      const url = await synthesizeSpeech(clean);
-      if (url) {
-        player.rememberObjectUrl(url);
-        await player.play(url, fallbackMs);
-        return "tts";
-      }
-      if (options.allowBrowser) speakBrowser(clean);
-      await player.pulseFake(fallbackMs);
-      try {
-        window.speechSynthesis?.cancel();
-      } catch {
-        /* ignore */
-      }
-      return options.allowBrowser ? "browser" : "fake";
+      setLevel(0.22);
+      const hold = reduced.current
+        ? Math.min(duration || 1800, 1600)
+        : readingTimeMs(clean, duration);
+      await waitMs(hold);
+      if (gen !== speakGenRef.current) return "stopped";
+      setLevel(0);
+      setOrbState((prev) => (prev === "speaking" ? (chatOpenRef.current ? "open" : "idle") : prev));
+      return "text";
     },
-    [player]
+    [waitMs]
   );
 
   const speakAudio = useCallback(
-    async (url, duration, text) => {
-      const clean = String(text || "").trim();
-      if (clean) setBubble(clean);
+    async (_url, duration, text) => speak(text, duration),
+    [speak]
+  );
+
+  const pulse = useCallback(
+    async (ms) => {
+      const gen = (speakGenRef.current += 1);
       setOrbState("speaking");
-      if (reduced.current) {
-        await new Promise((resolve) => setTimeout(resolve, Math.min(duration || 1800, 1600)));
-        setOrbState(chatOpenRef.current ? "open" : "idle");
-        return;
-      }
-      await player.play(url, duration || 2200);
+      setLevel(0.22);
+      await waitMs(ms || 1800);
+      if (gen !== speakGenRef.current) return;
+      setLevel(0);
+      setOrbState((prev) => (prev === "speaking" ? (chatOpenRef.current ? "open" : "idle") : prev));
     },
-    [player]
+    [waitMs]
   );
 
   const applyHighlight = useCallback((target, options) => {
@@ -178,7 +164,7 @@ export function AIOrb() {
       addMessage: (item) => setMessages((prev) => [...prev, item]),
       speak,
       speakAudio,
-      pulse: (ms) => player.pulseFake(ms),
+      pulse,
       stopSpeech,
       onStart: () => setDemoActive(true),
       onEnd: () => {
@@ -207,7 +193,7 @@ export function AIOrb() {
       setOrbBridge(null);
       if (window.starywrldAssistant === helpers) delete window.starywrldAssistant;
     };
-  }, [applyHighlight, onDemo, player, speak, speakAudio, stopSpeech]);
+  }, [applyHighlight, onDemo, pulse, speak, speakAudio, stopSpeech]);
 
   useEffect(() => {
     if (onDemo && !scripted) setVisible(false);
@@ -233,10 +219,10 @@ export function AIOrb() {
 
   useEffect(
     () => () => {
-      player.destroy();
+      stopSpeech();
       clearHighlight();
     },
-    [player]
+    [stopSpeech]
   );
 
   const toggleChat = useCallback(() => {
@@ -313,7 +299,7 @@ export function AIOrb() {
       ) : null}
 
       <div className="ai-orb-stage">
-        {bubble && !chatOpen ? (
+        {bubble ? (
           <div className="ai-orb-bubble" aria-live="polite">
             {bubble}
           </div>

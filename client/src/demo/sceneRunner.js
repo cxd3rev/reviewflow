@@ -102,10 +102,10 @@ export function createSceneRunner({ orb, stageEl, onScene, onBeat, onProgress, o
         try {
           await playNarration(orb, {
             text: scene.narration,
-            audio: scene.audio,
             duration: scene.speechMs,
           });
         } catch {
+          orb.setBubble?.(scene.narration);
           await orb.pulse?.(scene.speechMs || 1800);
         }
       }

@@ -43,7 +43,7 @@ export function CaptureButton({ onStartDemo }) {
     if (!navigator.mediaDevices?.getDisplayMedia) return;
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: { frameRate: 30, displaySurface: "browser" },
-      audio: true,
+      audio: false,
       preferCurrentTab: true,
     });
     const mime = pickMime();

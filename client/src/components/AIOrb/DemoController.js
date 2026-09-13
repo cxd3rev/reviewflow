@@ -1,6 +1,6 @@
 /**
  * Runs a demoScript without calling the AI API.
- * Steps: appear, move, speak, highlight, bubble, state, openChat, closeChat, message, wait.
+ * Steps: appear, move, speak (text balloon), highlight, bubble, state, openChat, closeChat, message, wait.
  */
 export function createDemoController(api) {
   let cancelled = false;

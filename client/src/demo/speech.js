@@ -1,52 +1,26 @@
-import { demoAudioUrl, mediaExists } from "./assets.js";
-
-let utterance = null;
-
-function cancelBrowserSpeech() {
-  try {
-    window.speechSynthesis?.cancel();
-  } catch {
-    /* ignore */
-  }
-  utterance = null;
-}
-
-function speakBrowser(text) {
-  if (!text || typeof window === "undefined" || !window.speechSynthesis) return false;
-  cancelBrowserSpeech();
-  utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 1;
-  utterance.pitch = 1;
-  utterance.lang = document.documentElement.lang || "en";
-  window.speechSynthesis.speak(utterance);
-  return true;
+/** Estimate how long a balloon should stay visible. Scene speechMs wins when set. */
+export function readingTimeMs(text, duration) {
+  if (Number.isFinite(duration) && duration > 0) return duration;
+  const clean = String(text || "").trim();
+  if (!clean) return 0;
+  return Math.min(8000, Math.max(1200, 900 + clean.length * 28));
 }
 
 /**
- * Audio file → existing TTS → speechSynthesis + fake envelope → fake envelope.
- * Always drives the shared speech player so --orb-level still pulses.
+ * Show narration as a speech bubble only. No audio files, TTS, or speechSynthesis.
  */
-export async function playNarration(orb, { text, audio, duration }) {
+export async function playNarration(orb, { text, duration }) {
   const clean = String(text || "").trim();
-  const fallbackMs = duration || Math.min(8000, 900 + clean.length * 28);
-  if (!clean && !audio) return;
-
-  if (audio) {
-    const url = demoAudioUrl(audio);
-    if (await mediaExists(url)) {
-      await orb.speakAudio(url, fallbackMs, clean);
-      return;
-    }
+  if (!clean) return;
+  const ms = readingTimeMs(clean, duration);
+  if (orb.speak) {
+    await orb.speak(clean, ms);
+    return;
   }
-
-  if (clean && orb.speak) {
-    const usedTts = await orb.speak(clean, fallbackMs, { allowBrowser: true });
-    if (usedTts !== "empty") return;
-  }
-
-  if (clean) speakBrowser(clean);
-  await orb.pulse?.(fallbackMs);
-  cancelBrowserSpeech();
+  orb.setBubble?.(clean);
+  orb.setOrbState?.("speaking");
+  await new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
-export { cancelBrowserSpeech };
+/** Voice is disabled — kept so the scene runner can still call stop. */
+export function cancelBrowserSpeech() {}

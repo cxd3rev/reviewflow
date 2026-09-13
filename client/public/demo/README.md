@@ -3,7 +3,7 @@
 This folder holds optional media for the website player and the live `/demo` walkthrough.
 
 - Drop a captured file here as **`starywrld-demo.mp4`**. The landing player uses it when present.
-- Put optional narration takes in **`audio/`** using the filenames in `client/src/demo/narration.js` / `scenes.js` (`hook.mp3`, `problem.mp3`, `how1.mp3`, …). If a file is missing, the orb uses TTS, then `speechSynthesis`, then a fake envelope so it still pulses.
+- The live orb does **not** speak. Narration is text balloons only. Do not record orb voice, TTS, or `speechSynthesis`.
 - Do not commit a fake product video. Capture the real `/demo` run.
 
 The interactive master is **`http://localhost:5173/demo`** (about 4:30, deterministic). Recording mode: **`http://localhost:5173/demo?record=1`**.
@@ -23,7 +23,7 @@ Then open `http://localhost:5173/demo`.
 2. Wait for the 16:9 stage (no Start button). Do not click the page.
 3. OBS → Sources → Display Capture or Window Capture (the browser).
 4. Canvas **1920×1080**, **30 fps**. Crop to the 16:9 stage if the window is larger.
-5. Audio: capture the browser tab / desktop audio so narration is in the file.
+5. Video only is enough. The orb has no voice; add a soundtrack later in the editor if you want one.
 6. Start recording, let the walkthrough finish on the Get started CTA (~4:30), stop.
 7. Export **MP4 (H.264)** and save as `client/public/demo/starywrld-demo.mp4`.
 
@@ -31,7 +31,7 @@ Then open `http://localhost:5173/demo`.
 
 1. Open `http://localhost:5173/demo?record=1` in Edge or Chrome.
 2. Clipchamp → Record & create → Screen.
-3. Pick the browser window or this tab. Include tab audio.
+3. Pick the browser window or this tab. Tab audio is optional (the orb is silent).
 4. Record the full walkthrough, stop, export MP4.
 5. Save as `client/public/demo/starywrld-demo.mp4`.
 
@@ -49,4 +49,4 @@ On `/demo` (not `?record=1`), use **Record this demo**. The browser asks which t
 
 ## After the MP4 exists
 
-Reload the landing page. The demo section plays that file (no autoplay sound). If the file is missing, Play opens the live `/demo` walkthrough instead.
+Reload the landing page. The demo section plays that file (no autoplay sound). Volume on that player is for the recorded video, not the live orb. If the file is missing, Play opens the live `/demo` walkthrough instead.
